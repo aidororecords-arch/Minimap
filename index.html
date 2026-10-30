@@ -1,0 +1,4394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Bomber Tanks</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* --- FIRST SPLASH SCREEN --- */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, #222 0%, #111 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100002;
+      gap: clamp(15px, 3vh, 25px);
+      padding: clamp(15px, 4vw, 30px);
+    }
+
+    #splash-screen h1 {
+      color: #e9c46a;
+      font-size: clamp(26px, 7vw, 40px);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+      text-shadow: 0 0 15px rgba(233, 196, 106, 0.5);
+    }
+
+    .play-now-btn {
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: clamp(12px, 2.5vh, 18px) clamp(30px, 6vw, 45px);
+      border-radius: 30px;
+      font-size: clamp(15px, 4vw, 20px);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(230, 57, 70, 0.6);
+      transition: transform 0.1s, filter 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .play-now-btn:active {
+      transform: scale(0.95);
+      filter: brightness(1.2);
+    }
+
+    /* --- AUTHENTICATION MODALS --- */
+    #auth-screen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, #222 0%, #111 100%);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100000;
+      padding: clamp(10px, 3vw, 20px);
+      overflow-y: auto;
+    }
+
+    .auth-card {
+      background: #222;
+      border: 2px solid #e9c46a;
+      border-radius: 18px;
+      width: min(94vw, 380px);
+      padding: clamp(15px, 4vw, 25px);
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(10px, 2.5vh, 16px);
+      margin: auto;
+    }
+
+    .auth-card h2 {
+      text-align: center;
+      color: #e9c46a;
+      font-size: clamp(18px, 5vw, 22px);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group label {
+      font-size: clamp(11px, 3vw, 13px);
+      color: #aaa;
+    }
+
+    .form-group input {
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: clamp(8px, 1.5vh, 12px);
+      color: #fff;
+      font-size: clamp(13px, 3.5vw, 15px);
+      outline: none;
+      width: 100%;
+    }
+
+    .form-group input:focus {
+      border-color: #e9c46a;
+    }
+
+    .auth-btn {
+      background: #2b9348;
+      color: white;
+      border: none;
+      padding: clamp(10px, 2vh, 14px);
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: clamp(14px, 3.8vw, 16px);
+      cursor: pointer;
+      transition: filter 0.2s;
+      margin-top: 5px;
+      width: 100%;
+    }
+
+    .auth-btn:active {
+      filter: brightness(1.2);
+    }
+
+    .auth-switch {
+      text-align: center;
+      font-size: clamp(11px, 3vw, 13px);
+      color: #aaa;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .auth-switch:hover {
+      color: #e9c46a;
+    }
+
+    /* --- BACK-END ADMIN DASHBOARD STYLES --- */
+    #admin-dashboard {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #121212;
+      display: none;
+      flex-direction: column;
+      z-index: 95000;
+      color: #fff;
+      padding: 12px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e9c46a;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .admin-header h1 {
+      color: #e9c46a;
+      font-size: clamp(16px, 4vw, 22px);
+    }
+
+    .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .admin-section {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .admin-section-header {
+      background: #262626;
+      padding: 12px 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    .admin-section-header:hover {
+      background: #333;
+    }
+
+    .admin-section-header h3 {
+      color: #4af626;
+      font-size: clamp(13px, 3.5vw, 15px);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .accordion-arrow {
+      color: #e9c46a;
+      font-size: 14px;
+      transition: transform 0.3s ease;
+    }
+
+    .admin-section-content {
+      padding: 12px;
+      display: none;
+      border-top: 1px solid #333;
+      overflow-x: auto;
+    }
+
+    .table-scroll-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .asset-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+      text-align: center;
+      background: #222;
+      border-radius: 8px;
+      overflow: hidden;
+      min-width: 280px;
+    }
+
+    .asset-table th, .asset-table td {
+      border: 1px solid #e9c46a;
+      padding: 8px 6px;
+      font-size: clamp(11px, 3vw, 13px);
+    }
+
+    .asset-table th {
+      background: #2a2a2a;
+      color: #e9c46a;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .asset-table td {
+      font-weight: bold;
+      color: #4af626;
+      background: #1a1a1a;
+    }
+
+    .bonus-btn-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+      width: 100%;
+    }
+
+    .bonus-card-btn {
+      background: #222;
+      border: 2px solid #e9c46a;
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+      color: #e9c46a;
+      font-weight: bold;
+      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: transform 0.1s, background 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 60px;
+    }
+
+    .bonus-card-btn:active {
+      transform: scale(0.95);
+      background: #2a2a2a;
+    }
+
+    .search-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .autocomplete-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #1a1a1a;
+      border: 1px solid #444;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 150px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .autocomplete-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #fff;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .autocomplete-item:hover {
+      background: #2b9348;
+      color: #fff;
+    }
+
+    .admin-section.active .admin-section-content {
+      display: block;
+    }
+
+    .admin-section.active .accordion-arrow {
+      transform: rotate(180deg);
+    }
+
+    .admin-search-bar {
+      width: 100%;
+      background: #111;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    .maintenance-toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #2a2a2a;
+      padding: 10px 12px;
+      border-radius: 8px;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #e63946;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    .player-table, .request-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+      font-size: 12px;
+      min-width: 450px;
+    }
+
+    .player-table th, .player-table td, .request-table th, .request-table td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: left;
+    }
+
+    .player-table th, .request-table th {
+      background: #2a2a2a;
+      color: #e9c46a;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .approve-btn, .reject-btn, .delete-btn, .msg-btn {
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 11px;
+      border: none;
+      color: white;
+    }
+
+    .approve-btn { background: #2b9348; }
+    .reject-btn, .delete-btn { background: #e63946; margin-left: 2px; }
+    .msg-btn { background: #4895ef; margin-left: 2px; }
+
+    .broadcast-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .broadcast-container textarea {
+      width: 100%;
+      background: #111;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      resize: vertical;
+      min-height: 70px;
+      font-family: inherit;
+    }
+
+    /* --- MAINTENANCE OVERLAY --- */
+    #maintenance-screen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, #2a0808 0%, #0a0202 100%);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999999;
+      color: #fff;
+      padding: clamp(15px, 4vw, 25px);
+      text-align: center;
+    }
+
+    .maintenance-card {
+      background: rgba(30, 10, 10, 0.9);
+      border: 2px solid #e63946;
+      box-shadow: 0 0 30px rgba(230, 57, 70, 0.4);
+      border-radius: 20px;
+      padding: clamp(20px, 5vw, 35px);
+      max-width: 480px;
+      width: min(92vw, 480px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      backdrop-filter: blur(10px);
+    }
+
+    .maintenance-icon {
+      font-size: clamp(40px, 8vw, 60px);
+      color: #e63946;
+      animation: pulseWarning 1.5s infinite alternate;
+    }
+
+    @keyframes pulseWarning {
+      0% { transform: scale(1); filter: drop-shadow(0 0 5px #e63946); }
+      100% { transform: scale(1.1); filter: drop-shadow(0 0 20px #e63946); }
+    }
+
+    .maintenance-card h1 {
+      font-size: clamp(20px, 5vw, 28px);
+      color: #ff4d4d;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .maintenance-msg-box {
+      background: rgba(0, 0, 0, 0.6);
+      border-left: 4px solid #ff4d4d;
+      padding: 12px 15px;
+      border-radius: 8px;
+      font-size: clamp(12px, 3.5vw, 14px);
+      color: #ddd;
+      line-height: 1.5;
+      text-align: left;
+      width: 100%;
+    }
+
+    .maintenance-status {
+      font-size: clamp(12px, 3.2vw, 14px);
+      color: #ffb703;
+      font-weight: bold;
+    }
+
+    .maintenance-btn-speech {
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: clamp(11px, 3vw, 13px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(230, 57, 70, 0.4);
+      transition: transform 0.1s;
+    }
+
+    .maintenance-btn-speech:active { transform: scale(0.95); }
+
+    /* --- LOADING SCREEN --- */
+    #loading-screen {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #111 0%, #222 100%);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      color: #fff;
+      padding: 20px;
+    }
+
+    #loading-screen h1 {
+      font-size: clamp(22px, 6vw, 36px);
+      margin-top: 20px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #4af626;
+      text-shadow: 0 0 10px rgba(74, 246, 38, 0.5);
+    }
+
+    .progress-bar-container {
+      width: clamp(200px, 70vw, 300px);
+      height: 16px;
+      background: #333;
+      border: 2px solid #555;
+      border-radius: 10px;
+      margin-top: 25px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #2b9348, #55a630, #80b918);
+      transition: width 0.1s ease;
+    }
+
+    /* --- TANK SELECTION SCREEN --- */
+    #selection-screen {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 15, 15, 0.95);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 90;
+      color: #fff;
+      padding: clamp(10px, 3vw, 20px) clamp(5px, 2vw, 10px);
+      overflow-y: auto;
+    }
+
+    #selection-screen h2 {
+      font-size: clamp(18px, 5vw, 28px);
+      margin-bottom: 8px;
+      color: #e9c46a;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .selection-wallet-banner {
+      background: rgba(233, 196, 106, 0.15);
+      border: 1px solid #e9c46a;
+      padding: 6px 14px;
+      border-radius: 15px;
+      font-size: clamp(12px, 3.5vw, 14px);
+      color: #e9c46a;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .tank-grid {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      gap: 15px;
+      justify-content: flex-start;
+      align-items: center;
+      width: min(94vw, 800px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 15px 10px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      scroll-behavior: smooth;
+    }
+
+    .tank-grid::-webkit-scrollbar { display: none; }
+
+    .tank-card {
+      background: #2a2a2a;
+      border: 2px solid #444;
+      border-radius: 14px;
+      padding: clamp(10px, 2vw, 14px) clamp(8px, 2vw, 12px);
+      width: clamp(160px, 48vw, 220px);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      scroll-snap-align: center;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .tank-card.selected {
+      border-color: #4af626;
+      box-shadow: 0 6px 20px rgba(74, 246, 38, 0.4);
+      background: #253322;
+    }
+
+    .tank-card canvas {
+      background: transparent;
+      margin-bottom: 5px;
+      transform: scale(1.2);
+      margin-top: 2px;
+    }
+
+    .tank-card h3 {
+      font-size: clamp(12px, 3.5vw, 15px);
+      color: #fff;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .tank-card p {
+      font-size: clamp(10px, 2.8vw, 12px);
+      color: #aaa;
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 8px;
+    }
+
+    .buy-tank-action {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+
+    .buy-tank-action span {
+      font-size: 10px;
+      color: #e9c46a;
+      font-style: italic;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .tank-buy-btn {
+      background: #2b9348;
+      color: white;
+      border: none;
+      padding: clamp(6px, 1.2vh, 8px) 10px;
+      border-radius: 6px;
+      font-size: clamp(10px, 2.8vh, 12px);
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: filter 0.2s;
+    }
+
+    .tank-buy-btn:active { filter: brightness(1.2); }
+    .tank-buy-btn.owned { background: #555; color: #aaa; cursor: default; }
+
+    #start-btn {
+      margin-top: clamp(15px, 3vh, 25px);
+      padding: clamp(12px, 2.5vh, 16px) clamp(25px, 5vw, 35px);
+      font-size: clamp(15px, 4.2vw, 18px);
+      font-weight: bold;
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(230, 57, 70, 0.4);
+      transition: background 0.2s, transform 0.1s, opacity 0.2s;
+    }
+
+    #start-btn:active { transform: scale(0.95); background: #d62828; }
+    #start-btn:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; opacity: 0.7; }
+
+    /* --- GAME CANVAS & MINIMAP LOCATOR --- */
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #minimapCanvas {
+      position: absolute;
+      top: clamp(75px, 12vh, 100px);
+      left: clamp(10px, 3vw, 18px);
+      width: clamp(75px, 18vw, 110px);
+      height: clamp(75px, 18vw, 110px);
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(233, 196, 106, 0.7);
+      border-radius: 12px;
+      z-index: 60;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    }
+
+    canvas#gameCanvas {
+      width: 100%;
+      height: 100%;
+      background-color: #2b2b2b;
+      display: block;
+      touch-action: none;
+    }
+
+    /* --- RESPONSIVE UI OVERLAY --- */
+    #ui-overlay {
+      position: absolute;
+      top: clamp(6px, 1.5vh, 12px);
+      left: clamp(6px, 2vw, 12px);
+      right: clamp(6px, 2vw, 12px);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      color: #fff;
+      font-size: clamp(10px, 2.8vw, 14px);
+      font-weight: bold;
+      text-shadow: 2px 2px 4px #000;
+      pointer-events: none;
+      z-index: 50;
+      flex-wrap: nowrap;
+      gap: 4px;
+    }
+
+    #ui-overlay > * {
+      pointer-events: auto;
+    }
+
+    .status-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: clamp(5px, 0.8vh, 8px) clamp(6px, 1.5vw, 10px);
+      border-radius: 12px;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      flex-shrink: 0;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: clamp(4px, 1vw, 8px);
+      flex-wrap: nowrap;
+    }
+
+    .watch-ads-btn {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: linear-gradient(135deg, #f72585, #7209b7);
+      border: 1px solid #ff70a6;
+      border-radius: 8px;
+      padding: clamp(2px, 0.5vh, 4px) clamp(4px, 1vw, 6px);
+      color: white;
+      font-size: clamp(9px, 2.4vw, 11px);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      transition: transform 0.1s, filter 0.2s;
+    }
+
+    .watch-ads-btn:active { transform: scale(0.92); filter: brightness(1.2); }
+
+    .right-controls-group {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: clamp(2px, 0.8vw, 5px);
+      flex-wrap: nowrap;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    .pause-btn, .exit-btn {
+      background: #e76f51;
+      color: white;
+      border: 1px solid #f4a261;
+      padding: 0 clamp(4px, 1.2vw, 8px);
+      border-radius: 10px;
+      font-size: clamp(9px, 2.5vw, 11px);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+      transition: transform 0.1s, background 0.2s;
+      height: clamp(30px, 4.5vh, 38px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 1;
+    }
+
+    .exit-btn {
+      background: #6c757d;
+      border-color: #adb5bd;
+    }
+
+    .pause-btn:active, .exit-btn:active { transform: scale(0.95); }
+
+    .store-icon-btn, .notif-icon-btn, .msg-icon-btn {
+      width: clamp(30px, 4.5vh, 38px);
+      height: clamp(30px, 4.5vh, 38px);
+      background: rgba(0, 0, 0, 0.6);
+      border: 2px solid #e9c46a;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      position: relative;
+      transition: transform 0.1s, background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .notif-icon-btn { border-color: #4895ef; }
+    .msg-icon-btn { border-color: #e9c46a; }
+    .store-icon-btn:active, .notif-icon-btn:active, .msg-icon-btn:active { transform: scale(0.92); }
+
+    .notif-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #e63946;
+      color: white;
+      border-radius: 50%;
+      width: clamp(14px, 3vw, 16px);
+      height: clamp(14px, 3vw, 16px);
+      font-size: clamp(8px, 2vw, 9px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #fff;
+    }
+
+    /* --- RESPONSIVE MODAL STYLES --- */
+    #shop-modal, #notif-modal, #ads-modal, #message-modal, #admin-notif-modal, #player-info-modal, #bonus-modal-a, #bonus-modal-b, #bonus-modal-c {
+      position: absolute;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.88);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: clamp(10px, 3vw, 20px);
+    }
+
+    #admin-notif-modal, #player-info-modal, #bonus-modal-a, #bonus-modal-b, #bonus-modal-c {
+      z-index: 100000;
+    }
+
+    .shop-content, .notif-content, .ads-content, .message-content, .modal-card-box {
+      background: #222;
+      border: 2px solid #e9c46a;
+      border-radius: 16px;
+      width: min(94vw, 420px);
+      padding: clamp(12px, 3.5vw, 20px);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    .notif-content { border-color: #4895ef; }
+    .message-content { border-color: #e9c46a; }
+
+    .shop-header, .notif-header, .message-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #444;
+      padding-bottom: 8px;
+    }
+
+    .shop-header h3, .notif-header h3, .message-header h3 { color: #e9c46a; font-size: clamp(15px, 4vw, 18px); }
+    .notif-header h3 { color: #4895ef; }
+
+    .close-shop, .close-notif, .close-message {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    .shop-section {
+      background: #2a2a2a;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #444;
+    }
+
+    .shop-section h4 { font-size: clamp(12px, 3.5vw, 14px); color: #4af626; margin-bottom: 6px; }
+
+    .shop-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .shop-item:last-child { border-bottom: none; }
+
+    .tank-shop-card { display: flex; gap: 10px; align-items: center; width: 100%; }
+    .tank-shop-info { flex: 1; }
+
+    .buy-btn {
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: clamp(10px, 3vw, 12px);
+    }
+
+    .buy-btn:active { transform: scale(0.95); }
+
+    .notif-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+
+    .notif-item {
+      background: #2a2a2a;
+      border: 1px solid #3d3d3d;
+      border-left: 4px solid #4895ef;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: clamp(11px, 3.2vw, 12px);
+      line-height: 1.4;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .notif-item-canvas { flex-shrink: 0; margin-top: 2px; }
+    .notif-item-text { flex: 1; }
+    .notif-item .notif-time { font-size: 10px; color: #888; margin-top: 3px; }
+
+    #joystick-base {
+      position: absolute;
+      bottom: clamp(15px, 4vh, 30px);
+      left: clamp(15px, 4vw, 30px);
+      width: clamp(80px, 18vw, 105px);
+      height: clamp(80px, 18vw, 105px);
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      z-index: 60;
+      backdrop-filter: blur(4px);
+      touch-action: none;
+    }
+
+    #joystick-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 45%;
+      height: 45%;
+      margin-top: -22.5%;
+      margin-left: -22.5%;
+      background: rgba(255, 255, 255, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      pointer-events: none;
+      transition: transform 0.05s ease-out;
+    }
+
+    #btn-bomb {
+      position: absolute;
+      bottom: clamp(15px, 4vh, 35px);
+      right: clamp(15px, 4vw, 30px);
+      width: clamp(60px, 15vw, 75px);
+      height: clamp(60px, 15vw, 75px);
+      background: rgba(230, 57, 70, 0.25);
+      border: 2px solid rgba(230, 57, 70, 0.6);
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 60;
+      backdrop-filter: blur(4px);
+      touch-action: none;
+      outline: none;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    #btn-bomb:active { background: rgba(230, 57, 70, 0.6); transform: scale(0.92); }
+
+    #admin-email-modal {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 200000;
+      padding: 15px;
+    }
+
+    .email-modal-card {
+      background: #222;
+      border: 2px solid #e9c46a;
+      border-radius: 16px;
+      padding: clamp(15px, 4vw, 22px);
+      max-width: 360px;
+      width: min(92vw, 360px);
+      text-align: center;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .email-box {
+      background: #111;
+      border: 1px dashed #e9c46a;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #4af626;
+      font-size: clamp(12px, 3.2vw, 14px);
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FIRST SPLASH SCREEN -->
+  <div id="splash-screen">
+    <h1>Bomber Tanks</h1>
+    <button class="play-now-btn" onclick="proceedToAuth()">Click Here To Play</button>
+  </div>
+
+  <!-- AUTHENTICATION SCREEN -->
+  <div id="auth-screen">
+    <!-- LOGIN FORM -->
+    <div class="auth-card" id="login-container">
+      <h2>Tank Game Login</h2>
+      <div class="form-group">
+        <label>Full Name, Email, or Player ID</label>
+        <input type="text" id="login-username" placeholder="Enter Name, Email or Player ID">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter Password">
+      </div>
+      <button class="auth-btn" onclick="handleLogin()">Log In</button>
+      <div class="auth-switch" onclick="switchToSignup()">Don't have an account? Sign Up</div>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div class="auth-card" id="signup-container" style="display:none;">
+      <h2>Create Account</h2>
+      <div class="form-group">
+        <label>Full Name with Middle Name</label>
+        <input type="text" id="signup-fullname" placeholder="e.g. Juan Cruz Santos">
+      </div>
+      <div class="form-group">
+        <label>Active Email Address</label>
+        <input type="email" id="signup-email" placeholder="e.g. juan@email.com">
+      </div>
+      <div class="form-group">
+        <label>Birthday</label>
+        <input type="date" id="signup-bday">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="Create Password">
+      </div>
+      <button class="auth-btn" onclick="handleSignup()">Sign Up</button>
+      <div class="auth-switch" onclick="switchToLogin()">Already have an account? Log In</div>
+    </div>
+  </div>
+
+  <!-- HIDDEN BACK-END ADMIN DASHBOARD -->
+  <div id="admin-dashboard">
+    <div class="admin-header">
+      <h1>Bomber Tanks Admin Panel</h1>
+      <div class="admin-header-actions">
+        <button class="notif-icon-btn" onclick="openAdminNotifModal()" title="Admin Notifications" style="position:relative;">
+          <canvas id="adminNotifCanvas" width="22" height="22"></canvas>
+          <div class="notif-badge" id="admin-notif-badge" style="display:none;">0</div>
+        </button>
+        <button class="buy-btn" style="background:#2b9348;" onclick="testGameAsAdmin()">Test Game</button>
+        <button class="buy-btn" onclick="adminLogout()">Log Out</button>
+      </div>
+    </div>
+
+    <!-- 1. System Maintenance Switch -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>🛠️ System Maintenance Switch</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div class="maintenance-toggle-container">
+          <span>Enable System Maintenance Mode</span>
+          <label class="switch">
+            <input type="checkbox" id="maintenance-toggle-switch" onchange="toggleAdminMaintenance(this)">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. ASSETS INVENTORY -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>📊 Assets Inventory</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div class="table-scroll-wrapper">
+          <table class="asset-table">
+            <thead>
+              <tr>
+                <th>Incoming</th>
+                <th>Outgoing</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$<span id="asset-incoming-val">0.00</span></td>
+                <td>$<span id="asset-outgoing-val">0.00</span></td>
+                <td>$<span id="asset-total-val">0.00</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Player Info Button -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>👥 Player Info</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <button class="approve-btn" style="width:100%; padding:10px; font-size:13px;" onclick="openPlayerInfoModal()">View Player List</button>
+      </div>
+    </div>
+
+    <!-- 4. Admin Inbox / Messages from Players -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>📥 Admin Inbox (Messages from Players)</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+          <button class="delete-btn" style="background:#e63946; padding: 6px 12px;" onclick="clearAllAdminMessages()">Clear All Messages</button>
+        </div>
+        <div id="admin-inbox-container" style="display: flex; flex-direction: column; gap: 8px; max-height:250px; overflow-y:auto; padding-right: 5px;">
+          <p style="text-align:center; color:#888;">No messages received from players yet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Send Global Message -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>📢 Send Global Message</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div class="broadcast-container">
+          <textarea id="broadcast-msg-input" placeholder="Type global announcement message here..."></textarea>
+          <button class="approve-btn" style="padding: 8px;" onclick="sendBroadcastMessage()">Send Broadcast to All Players</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Admin Digital Currency Bonus & Map Drop -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>🎁 Admin Bonus & Map Drop</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div class="bonus-btn-grid">
+          <div class="bonus-card-btn" onclick="openBonusModal('A')">
+            <div>A. Bonus Player</div>
+          </div>
+          <div class="bonus-card-btn" onclick="openBonusModal('B')">
+            <div>B. Bonus All</div>
+          </div>
+          <div class="bonus-card-btn" onclick="openBonusModal('C')">
+            <div>C. Map Drop</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Recharge Money Approval -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>📥 Recharge Approval</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div class="table-scroll-wrapper" style="max-height: 250px; overflow-y: auto;">
+          <table class="request-table">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Amount ($)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-recharge-table-body">
+              <tr><td colspan="3" style="text-align:center; color:#888;">No pending recharge requests</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Withdraw Money Approval -->
+    <div class="admin-section">
+      <div class="admin-section-header" onclick="toggleAccordion(this)">
+        <h3>📤 Withdraw Approval</h3>
+        <span class="accordion-arrow">▼</span>
+      </div>
+      <div class="admin-section-content">
+        <div class="table-scroll-wrapper" style="max-height: 250px; overflow-y: auto;">
+          <table class="request-table">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Amount ($)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="admin-withdrawal-table-body">
+              <tr><td colspan="3" style="text-align:center; color:#888;">No pending withdrawal requests</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PLAYER INFO POPUP MODAL -->
+  <div id="player-info-modal">
+    <div class="modal-card-box" style="max-width: 650px; width: min(95vw, 650px);">
+      <div class="shop-header">
+        <h3>👥 Player Info List</h3>
+        <button class="close-shop" onclick="closePlayerInfoModal()">&times;</button>
+      </div>
+      <div class="search-container">
+        <input type="text" id="admin-player-search" class="admin-search-bar" placeholder="Search player by name or Player ID number..." oninput="handleSearchInput('admin-player-search', 'admin-player-search-auto', filterAdminPlayers)">
+        <div id="admin-player-search-auto" class="autocomplete-results"></div>
+      </div>
+      <div class="table-scroll-wrapper" style="max-height: 380px; overflow-y: auto;">
+        <table class="player-table">
+          <thead>
+            <tr>
+              <th>Player ID</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Birthday</th>
+              <th>Money ($)</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-player-table-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- BONUS A MODAL -->
+  <div id="bonus-modal-a">
+    <div class="modal-card-box">
+      <div class="shop-header">
+        <h3 style="color:#e9c46a;">A. Bonus to Player</h3>
+        <button class="close-shop" onclick="closeBonusModal('A')">&times;</button>
+      </div>
+      <div class="search-container">
+        <input type="text" id="admin-bonus-target-input" class="admin-search-bar" placeholder="Search player name or Player ID..." oninput="handleSearchInput('admin-bonus-target-input', 'admin-bonus-auto', searchAdminBonusTarget)" style="margin-bottom:6px;">
+        <div id="admin-bonus-auto" class="autocomplete-results"></div>
+      </div>
+      <div id="admin-bonus-target-result" style="font-size:11px; color:#4af626; min-height:16px; margin-bottom:6px;"></div>
+      <input type="number" id="admin-bonus-specific-amount" placeholder="Amount ($)" class="admin-search-bar" style="margin-bottom:8px;">
+      <button class="approve-btn" style="width:100%; padding:10px;" onclick="giveBonusToSpecificPlayer()">Released Bonus</button>
+    </div>
+  </div>
+
+  <!-- BONUS B MODAL -->
+  <div id="bonus-modal-b">
+    <div class="modal-card-box">
+      <div class="shop-header">
+        <h3 style="color:#4895ef;">B. Bonus to All Players</h3>
+        <button class="close-shop" onclick="closeBonusModal('B')">&times;</button>
+      </div>
+      <input type="number" id="admin-bonus-all-amount" placeholder="Amount para sa lahat ng players ($)" class="admin-search-bar" style="margin-bottom:8px;">
+      <button class="approve-btn" style="width:100%; padding:10px; background:#4895ef;" onclick="giveBonusToAllPlayers()">Released Bonus</button>
+    </div>
+  </div>
+
+  <!-- BONUS C MODAL -->
+  <div id="bonus-modal-c">
+    <div class="modal-card-box">
+      <div class="shop-header">
+        <h3 style="color:#e76f51;">C. Map Drop Bonus</h3>
+        <button class="close-shop" onclick="closeBonusModal('C')">&times;</button>
+      </div>
+      <input type="number" id="admin-map-drop-amount" placeholder="Amount bawat Gold Coin ($)?" class="admin-search-bar" style="margin-bottom:6px;">
+      <input type="number" id="admin-map-drop-count" placeholder="Ilang piraso ang Gold Coin?" class="admin-search-bar" style="margin-bottom:8px;">
+      <button class="approve-btn" style="width:100%; padding:10px; background:#e76f51;" onclick="dropCurrencyOnMap()">Released Bonus (Drop on Map)</button>
+    </div>
+  </div>
+
+  <!-- ADMIN NOTIFICATIONS MODAL -->
+  <div id="admin-notif-modal">
+    <div class="notif-content">
+      <div class="notif-header">
+        <h3>🔔 Admin System Notifications</h3>
+        <button class="close-notif" onclick="closeAdminNotifModal()">&times;</button>
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+        <button class="delete-btn" style="background:#e63946; padding: 5px 10px; font-size: 11px;" onclick="clearAdminNotifications()">Clear Message</button>
+      </div>
+      <div class="notif-list" id="admin-notif-list-container">
+        <p style="text-align:center; font-size:12px; color:#888; padding: 20px;">No admin notifications yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL SUPPORT MODAL -->
+  <div id="admin-email-modal">
+    <div class="email-modal-card">
+      <h3 style="color:#e9c46a;">Direct Help & Support</h3>
+      <p style="font-size:13px; color:#ddd; line-height:1.4;">
+        Hello, send all your concern to this email:
+      </p>
+      <div class="email-box" id="admin-email-text">admin.bombertanks@gmail.com</div>
+      <button class="auth-btn" style="background:#e9c46a; color:#111;" onclick="copyAdminEmail()">Copy Email Address</button>
+      <button class="buy-btn" style="background:#6c757d; margin-top:5px;" onclick="closeEmailModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- MAINTENANCE SCREEN -->
+  <div id="maintenance-screen">
+    <div class="maintenance-card">
+      <div class="maintenance-icon">🛠️</div>
+      <h1>System Maintenance</h1>
+      <div class="maintenance-msg-box">
+        <strong>ATTENTION USERS:</strong><br>
+        The application is currently undergoing scheduled server maintenance.
+      </div>
+      <div class="maintenance-status">
+        Status: <span style="color:#ff4d4d;">SERVER OFFLINE</span>
+      </div>
+      <button class="maintenance-btn-speech" onclick="speakMaintenanceWarning()">
+        <span>🔊 Repeat Audio Announcement</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING SCREEN -->
+  <div id="loading-screen">
+    <canvas id="loadingTankCanvas" width="120" height="120"></canvas>
+    <h1>WAR TANKS</h1>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <p style="margin-top: 10px; font-size: 13px; color: #888;">Preparing battlefield...</p>
+  </div>
+
+  <!-- TANK SELECTION SCREEN -->
+  <div id="selection-screen">
+    <h2>Select Your Tank</h2>
+    <div class="selection-wallet-banner">Digital Currency: $<span id="selection-gold-display">0.00</span></div>
+    
+    <div class="tank-grid" id="tankGridContainer">
+      <div class="tank-card selected" onclick="scrollToCard(0)">
+        <canvas id="tankPreview0" width="60" height="60"></canvas>
+        <h3>Desert Panzer</h3>
+        <p>Speed: 2.0 (Slow)<br>Armor: 1 Bomb Hit<br>Price: Free ($0)</p>
+        <div class="buy-tank-action">
+          <button class="tank-buy-btn owned" id="selectCardBtn0">Free / Owned</button>
+        </div>
+      </div>
+
+      <div class="tank-card" onclick="scrollToCard(1)">
+        <canvas id="tankPreview1" width="60" height="60"></canvas>
+        <h3>Green Camo</h3>
+        <p>Speed: 2.8 (Faster)<br>Armor: 2 Bomb Hits<br>Price: $150</p>
+        <div class="buy-tank-action">
+          <span onclick="event.stopPropagation(); quickBuyTankFromCard(1)">Buy this tank</span>
+          <button class="tank-buy-btn" id="selectCardBtn1" onclick="event.stopPropagation(); quickBuyTankFromCard(1)">Buy ($150)</button>
+        </div>
+      </div>
+
+      <div class="tank-card" onclick="scrollToCard(2)">
+        <canvas id="tankPreview2" width="60" height="60"></canvas>
+        <h3>Cyan Recon</h3>
+        <p>Speed: 5.6 (2x Speed)<br>Armor: 3 Bomb Hits<br>Price: $300</p>
+        <div class="buy-tank-action">
+          <span onclick="event.stopPropagation(); quickBuyTankFromCard(2)">Buy this tank</span>
+          <button class="tank-buy-btn" id="selectCardBtn2" onclick="event.stopPropagation(); quickBuyTankFromCard(2)">Buy ($300)</button>
+        </div>
+      </div>
+
+      <div class="tank-card" onclick="scrollToCard(3)">
+        <canvas id="tankPreview3" width="60" height="60"></canvas>
+        <h3>Shadow Stealth</h3>
+        <p>Speed: 11.2 (2x Cyan)<br>Armor: 4 Bomb Hits<br>Price: $600</p>
+        <div class="buy-tank-action">
+          <span onclick="event.stopPropagation(); quickBuyTankFromCard(3)">Buy this tank</span>
+          <button class="tank-buy-btn" id="selectCardBtn3" onclick="event.stopPropagation(); quickBuyTankFromCard(3)">Buy ($600)</button>
+        </div>
+      </div>
+    </div>
+    
+    <button id="start-btn" onclick="startGame()">ENTER BATTLEFIELD</button>
+  </div>
+
+  <!-- GAME STORE MODAL -->
+  <div id="shop-modal">
+    <div class="shop-content">
+      <div class="shop-header">
+        <h3>🏪 Game Store & Vault</h3>
+        <button class="close-shop" onclick="closeShop()">&times;</button>
+      </div>
+
+      <div style="background: rgba(233, 196, 106, 0.15); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #e9c46a;">
+        <span style="color: #e9c46a; font-size: 15px; font-weight: bold;">Digital Currency: $<span id="shop-gold-display">0.00</span></span>
+      </div>
+
+      <div class="shop-section">
+        <h4>1. Transfer Digital Money</h4>
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
+          <div class="search-container">
+            <input type="text" id="transfer-search-input" placeholder="Search player name or ID..." style="background:#111; border:1px solid #444; color:#fff; padding:8px; border-radius:6px; font-size:12px; width:100%;" oninput="handleSearchInput('transfer-search-input', 'transfer-search-auto', searchPlayerForTransfer)">
+            <div id="transfer-search-auto" class="autocomplete-results"></div>
+          </div>
+          <div id="transfer-search-result" style="font-size:12px; color:#4af626; min-height: 18px;"></div>
+          <input type="number" id="transfer-amount-input" placeholder="Enter amount ($)" style="background:#111; border:1px solid #444; color:#fff; padding:8px; border-radius:6px; font-size:12px;">
+          <button class="buy-btn" style="background: #4895ef; margin-top:4px;" onclick="executeFundTransfer()">Transfer Funds</button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h4>2. Recharge Digital Currency</h4>
+        <div class="shop-item">
+          <div>
+            <p style="font-size: 13px;">$1 USD = $1 Digital Currency</p>
+          </div>
+          <button class="buy-btn" style="background: #2b9348;" onclick="requestRecharge()">Recharge (+)</button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h4>3. Withdraw Digital Currency</h4>
+        <div class="shop-item">
+          <div>
+            <p style="font-size: 13px;">Withdraw funds from wallet</p>
+          </div>
+          <button class="buy-btn" style="background: #e63946;" onclick="requestWithdrawal()">Withdraw (-)</button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h4>4. Convert Life to Digital Currency</h4>
+        <div class="shop-item">
+          <div>
+            <p style="font-size: 13px;">10,000 Life = $1 Digital Currency</p>
+            <p style="font-size: 11px; color: #aaa;">Current Life: <span id="shop-life-display">100</span></p>
+          </div>
+          <button class="buy-btn" style="background: #e76f51;" onclick="convertLifeToGold()">Convert</button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h4>5. Buy Life Points</h4>
+        <div class="shop-item">
+          <div>
+            <p style="font-size: 13px;">$1 Digital Currency = +50 Life Points</p>
+          </div>
+          <button class="buy-btn" onclick="buyLife()">Buy (+50 HP)</button>
+        </div>
+      </div>
+
+      <div class="shop-section">
+        <h4>6. Buy / Select War Tanks</h4>
+        <div id="tank-shop-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIRECT MESSAGE MODAL -->
+  <div id="message-modal">
+    <div class="message-content">
+      <div class="message-header">
+        <h3>💬 Send Message to Admin or Player</h3>
+        <button class="close-message" onclick="closeMessageModal()">&times;</button>
+      </div>
+
+      <div class="shop-section">
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 5px;">
+          <div class="search-container">
+            <input type="text" id="pm-search-input" placeholder="Type #Admin or Search player name/ID..." style="background:#111; border:1px solid #444; color:#fff; padding:8px; border-radius:6px; font-size:12px; width:100%;" oninput="handleSearchInput('pm-search-input', 'pm-search-auto', searchPlayerForMessage)">
+            <div id="pm-search-auto" class="autocomplete-results"></div>
+          </div>
+          <div id="pm-search-result" style="font-size:12px; color:#4af626; min-height: 18px;">Recipient: Direct to Admin</div>
+          <textarea id="pm-text-input" placeholder="Type your message here..." style="background:#111; border:1px solid #444; color:#fff; padding:8px; border-radius:6px; font-size:12px; resize:none; height:70px;"></textarea>
+          <button class="buy-btn" style="background: #e9c46a; color:#111; margin-top:4px; font-weight:bold;" onclick="sendPlayerDirectMessage()">Send Message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION BELL MODAL -->
+  <div id="notif-modal">
+    <div class="notif-content">
+      <div class="notif-header">
+        <h3>🔔 Notifications & Activity Log</h3>
+        <button class="close-notif" onclick="closeNotif()">&times;</button>
+      </div>
+      <div class="notif-list" id="notif-list-container"></div>
+    </div>
+  </div>
+
+  <!-- WATCH ADS MODAL -->
+  <div id="ads-modal">
+    <div class="ads-content" style="text-align: center; border-color: #f72585;">
+      <h3 style="color: #f72585;">Sponsored Video Ad</h3>
+      <div style="background: #000; height: 180px; border-radius: 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; margin: 10px 0; border: 1px solid #444;">
+        <p style="font-size: 14px; color: #aaa;">Watching Video Advertisement...</p>
+        <h1 id="ads-timer" style="font-size: 40px; color: #4af626; margin-top: 10px;">5</h1>
+      </div>
+      <p style="font-size: 12px; color: #888;">Complete watching to earn +5 Life Points!</p>
+    </div>
+  </div>
+
+  <!-- MAIN GAME CONTAINER -->
+  <div id="game-container">
+    <canvas id="minimapCanvas" width="110" height="110"></canvas>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="ui-overlay">
+      <div class="status-group">
+        <div id="network-status" role="status" aria-live="polite" style="display:inline-block; margin-top:3px; padding:3px 7px; border:1px solid #666; border-radius:10px; background:rgba(0,0,0,.75); color:#ffd166; font-size:10px; font-weight:bold;">● CONNECTING TO SERVER…</div>
+        <div class="status-row">
+          <span>Lives: <span id="life-count">100</span></span>
+          <button class="watch-ads-btn" onclick="watchAdsForLives()" title="Watch Ad for +5 HP">
+            <canvas id="adsIconCanvas" width="16" height="14"></canvas>
+            <span>+5 HP</span>
+          </button>
+          <span style="margin-left: 2px;">$: <span id="gold-count">0.00</span></span>
+        </div>
+        <span id="player-id-badge" style="color: #e9c46a; font-size: 10px; font-weight: normal;">ID: TANK-0000</span>
+      </div>
+
+      <div class="right-controls-group">
+        <button id="pause-btn" class="pause-btn" onclick="togglePause()">PAUSE</button>
+
+        <div class="msg-icon-btn" onclick="openMessageModal()" title="Message Admin or Player">
+          <canvas id="msgIconCanvas" width="22" height="18"></canvas>
+          <span style="font-size: 6px; color: #e9c46a; margin-top: 1px;">CHAT</span>
+        </div>
+
+        <button id="exit-btn" class="exit-btn" onclick="confirmExitGame()">EXIT</button>
+
+        <div class="notif-icon-btn" onclick="openNotif()" title="Notifications">
+          <canvas id="notifIconCanvas" width="22" height="22"></canvas>
+          <div class="notif-badge" id="notif-badge" style="display:none;">0</div>
+        </div>
+
+        <div class="store-icon-btn" onclick="openShop()" title="Open Store">
+          <canvas id="storeIconCanvas" width="22" height="20"></canvas>
+          <span style="font-size: 7px; color: #e9c46a;">STORE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="joystick-base">
+    <div id="joystick-handle"></div>
+  </div>
+  <button id="btn-bomb" title="Drop Bomb"></button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    /* =======================================================
+       SYSTEM STATE & STORAGE MANAGEMENT
+       ======================================================= */
+    let registeredUsers = JSON.parse(localStorage.getItem('war_tanks_users')) || [
+      { fullname: "Raylin Dela Cruz", email: "admin@tanks.com", bday: "2000-01-01", password: "1432", gold: 1000, lives: 100, messages: [], adminInbox: [], playerId: "TANK-ADMIN01" }
+    ];
+    let pendingRecharges = JSON.parse(localStorage.getItem('war_tanks_pending_recharges')) || [];
+    let pendingWithdrawals = JSON.parse(localStorage.getItem('war_tanks_pending_withdrawals')) || [];
+    let isMaintenanceActive = JSON.parse(localStorage.getItem('war_tanks_maintenance')) !== null ? JSON.parse(localStorage.getItem('war_tanks_maintenance')) : false;
+    let loggedInUser = null;
+    let selectedTransferTarget = null;
+    let selectedMessageTarget = null;
+    let selectedBonusTarget = null;
+    let isZeroFundWarningShown = false;
+
+    let adminAssets = JSON.parse(localStorage.getItem('war_tanks_assets')) || { incoming: 0, outgoing: 0 };
+    let adminNotifications = JSON.parse(localStorage.getItem('war_tanks_admin_notifs')) || [];
+    let mapCurrencyDrops = JSON.parse(localStorage.getItem('war_tanks_map_drops')) || [];
+
+    function saveAppData() {
+      localStorage.setItem('war_tanks_users', JSON.stringify(registeredUsers));
+      localStorage.setItem('war_tanks_pending_recharges', JSON.stringify(pendingRecharges));
+      localStorage.setItem('war_tanks_pending_withdrawals', JSON.stringify(pendingWithdrawals));
+      localStorage.setItem('war_tanks_maintenance', JSON.stringify(isMaintenanceActive));
+      localStorage.setItem('war_tanks_map_drops', JSON.stringify(mapCurrencyDrops));
+      localStorage.setItem('war_tanks_assets', JSON.stringify(adminAssets));
+      localStorage.setItem('war_tanks_admin_notifs', JSON.stringify(adminNotifications));
+    }
+
+    // Separate lightweight socket for admin actions, so the admin dashboard can
+    // send messages/bonuses without joining the game as a tank.
+    let adminSocket = null;
+    function emitAdminEvent(eventName, payload) {
+      if (networkSocket && networkSocket.connected) {
+        networkSocket.emit(eventName, payload);
+        return;
+      }
+      if (typeof io !== "function") return;
+      if (!adminSocket) adminSocket = io({ transports: ["websocket", "polling"] });
+      adminSocket.emit(eventName, payload);
+    }
+
+    function proceedToAuth() {
+      document.getElementById('splash-screen').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+
+    function addAdminNotification(text) {
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      adminNotifications.unshift({ text, time: timeStr });
+      saveAppData();
+      updateAdminNotifBadge();
+    }
+
+    function clearAdminNotifications() {
+      adminNotifications = [];
+      saveAppData();
+      openAdminNotifModal();
+      updateAdminNotifBadge();
+    }
+
+    function updateAdminNotifBadge() {
+      const badge = document.getElementById("admin-notif-badge");
+      if (badge) {
+        if (adminNotifications.length > 0) {
+          badge.innerText = adminNotifications.length;
+          badge.style.display = "flex";
+        } else {
+          badge.style.display = "none";
+        }
+      }
+    }
+
+    function renderAssetsUI() {
+      document.getElementById('asset-incoming-val').innerText = Number(adminAssets.incoming).toFixed(2);
+      document.getElementById('asset-outgoing-val').innerText = Number(adminAssets.outgoing).toFixed(2);
+      document.getElementById('asset-total-val').innerText = (Number(adminAssets.incoming) - Number(adminAssets.outgoing)).toFixed(2);
+    }
+
+    function toggleAccordion(headerElem) {
+      const parentSection = headerElem.parentElement;
+      parentSection.classList.toggle('active');
+    }
+
+    /* PLAYER INFO MODAL CONTROLS */
+    function openPlayerInfoModal() {
+      document.getElementById('player-info-modal').style.display = 'flex';
+      filterAdminPlayers();
+    }
+    function closePlayerInfoModal() {
+      document.getElementById('player-info-modal').style.display = 'none';
+    }
+
+    /* BONUS MODALS CONTROLS */
+    function openBonusModal(type) {
+      if (type === 'A') document.getElementById('bonus-modal-a').style.display = 'flex';
+      if (type === 'B') document.getElementById('bonus-modal-b').style.display = 'flex';
+      if (type === 'C') document.getElementById('bonus-modal-c').style.display = 'flex';
+    }
+    function closeBonusModal(type) {
+      if (type === 'A') document.getElementById('bonus-modal-a').style.display = 'none';
+      if (type === 'B') document.getElementById('bonus-modal-b').style.display = 'none';
+      if (type === 'C') document.getElementById('bonus-modal-c').style.display = 'none';
+    }
+
+    function switchToSignup() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('signup-container').style.display = 'flex';
+    }
+
+    function switchToLogin() {
+      document.getElementById('signup-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'flex';
+    }
+
+    function handleSignup() {
+      const fullname = document.getElementById('signup-fullname').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const bday = document.getElementById('signup-bday').value;
+      const password = document.getElementById('signup-password').value.trim();
+
+      if (!fullname || !email || !bday || !password) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      const existingUser = registeredUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (existingUser) {
+        alert("An account with this email address already exists!");
+        return;
+      }
+
+      const randomIdNum = Math.floor(10000 + Math.random() * 90000);
+      const playerId = `TANK-${randomIdNum}`;
+
+      registeredUsers.push({
+        fullname: fullname,
+        email: email,
+        bday: bday,
+        password: password,
+        gold: 0,
+        lives: 100,
+        tanksOwned: [true, false, false, false],
+        messages: [],
+        adminInbox: [],
+        playerId: playerId
+      });
+
+      saveAppData();
+      alert(`Account created successfully! Your Player ID: ${playerId}`);
+      switchToLogin();
+      document.getElementById('login-username').value = playerId;
+    }
+
+    function handleLogin() {
+      const usernameInput = document.getElementById('login-username').value.trim();
+      const passwordInput = document.getElementById('login-password').value.trim();
+
+      if (!usernameInput || !passwordInput) {
+        alert("Please enter credentials.");
+        return;
+      }
+
+      if ((usernameInput.toLowerCase() === "raylin dela cruz" || usernameInput.toLowerCase() === "admin@tanks.com") && passwordInput === "1432") {
+        loggedInUser = registeredUsers.find(u => u.fullname.toLowerCase() === "raylin dela cruz");
+        if (!loggedInUser) {
+          loggedInUser = { fullname: "Raylin Dela Cruz", email: "admin@tanks.com", gold: 1000, lives: 100, tanksOwned: [true,true,true,true], messages: [], adminInbox: [], playerId: "TANK-ADMIN01" };
+          registeredUsers.push(loggedInUser);
+        }
+        document.getElementById('auth-screen').style.display = 'none';
+        openAdminDashboard();
+        return;
+      }
+
+      const user = registeredUsers.find(u => 
+        (
+          u.fullname.toLowerCase() === usernameInput.toLowerCase() || 
+          u.email.toLowerCase() === usernameInput.toLowerCase() || 
+          (u.playerId && u.playerId.toLowerCase() === usernameInput.toLowerCase())
+        ) && u.password === passwordInput
+      );
+
+      if (user) {
+        loggedInUser = user;
+        playerGold = user.gold !== undefined ? Number(user.gold) : 0;
+        player.lives = user.lives !== undefined ? user.lives : 100;
+        if (user.tanksOwned) {
+          user.tanksOwned.forEach((owned, idx) => {
+            if (TANK_TYPES[idx]) TANK_TYPES[idx].owned = owned;
+          });
+        }
+
+        if (user.messages && Array.isArray(user.messages)) {
+          user.messages.forEach(msg => addNotification(`<b>📢 Admin Message:</b> ${msg}`));
+          user.messages = [];
+          saveAppData();
+        }
+
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('player-id-badge').innerText = `ID: ${user.playerId || 'TANK-0000'}`;
+        if (!checkSystemMaintenance()) {
+          startAppLoading();
+        }
+      } else {
+        alert("Invalid credentials or account does not exist.");
+      }
+    }
+
+    function confirmExitGame() {
+      if (!isGamePaused) togglePause();
+      let confirmExit = confirm("Are you sure you want to exit the game?");
+      if (confirmExit) {
+        document.getElementById('game-container').style.display = 'none';
+        document.getElementById('selection-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+        loggedInUser = null;
+      } else {
+        if (isGamePaused) togglePause();
+      }
+    }
+
+    function openAdminDashboard() {
+      document.getElementById('admin-dashboard').style.display = 'flex';
+      document.getElementById('maintenance-toggle-switch').checked = isMaintenanceActive;
+      renderAdminTables(registeredUsers);
+      renderAdminInbox();
+      renderAssetsUI();
+      drawBellIconCanvas('adminNotifCanvas');
+      updateAdminNotifBadge();
+    }
+
+    /* AUTOCOMPLETE SEARCH HANDLER */
+    function handleSearchInput(inputId, containerId, onSelectCallback) {
+      const inputElem = document.getElementById(inputId);
+      const autoContainer = document.getElementById(containerId);
+      const query = inputElem.value.toLowerCase().trim();
+
+      if (!query || query === "#admin") {
+        autoContainer.style.display = "none";
+        if (onSelectCallback) onSelectCallback();
+        return;
+      }
+
+      const matches = registeredUsers.filter(u => 
+        u.fullname.toLowerCase().includes(query) || 
+        (u.playerId && u.playerId.toLowerCase().includes(query)) ||
+        (u.email && u.email.toLowerCase().includes(query))
+      );
+
+      if (matches.length > 0) {
+        autoContainer.innerHTML = matches.map(u => `
+          <div class="autocomplete-item" onmousedown="selectSearchResult('${inputId}', '${containerId}', '${u.fullname.replace(/'/g, "\\'")}', '${u.playerId}')">
+            <b>${u.fullname}</b> (${u.playerId || 'N/A'})
+          </div>
+        `).join('');
+        autoContainer.style.display = "block";
+      } else {
+        autoContainer.style.display = "none";
+      }
+
+      if (onSelectCallback) onSelectCallback();
+    }
+
+    function selectSearchResult(inputId, containerId, fullname, playerId) {
+      const inputElem = document.getElementById(inputId);
+      const autoContainer = document.getElementById(containerId);
+      
+      inputElem.value = `${fullname} (${playerId})`;
+      autoContainer.style.display = "none";
+
+      const found = registeredUsers.find(u => u.playerId === playerId);
+
+      if (inputId === 'admin-player-search') {
+        filterAdminPlayers();
+      } else if (inputId === 'admin-bonus-target-input') {
+        selectedBonusTarget = found;
+        const resultBox = document.getElementById('admin-bonus-target-result');
+        if (found) {
+          resultBox.innerHTML = `✅ Found: <b>${found.fullname}</b> (${found.playerId})`;
+          resultBox.style.color = "#4af626";
+        }
+      } else if (inputId === 'transfer-search-input') {
+        selectedTransferTarget = found;
+        const resultBox = document.getElementById('transfer-search-result');
+        if (found) {
+          resultBox.innerHTML = `✅ Found: <b>${found.fullname}</b> (ID: ${found.playerId})`;
+          resultBox.style.color = "#4af626";
+        }
+      } else if (inputId === 'pm-search-input') {
+        selectedMessageTarget = found;
+        const resultBox = document.getElementById('pm-search-result');
+        if (found) {
+          resultBox.innerHTML = `✅ Selected Player: <b>${found.fullname}</b> (${found.playerId})`;
+          resultBox.style.color = "#4af626";
+        }
+      }
+    }
+
+    function filterAdminPlayers() {
+      const query = document.getElementById('admin-player-search').value.toLowerCase().trim();
+      const filtered = registeredUsers.filter(u => 
+        u.fullname.toLowerCase().includes(query) || 
+        (u.playerId && u.playerId.toLowerCase().includes(query)) ||
+        (u.email && u.email.toLowerCase().includes(query))
+      );
+      renderAdminTables(filtered);
+    }
+
+    function adminLogout() {
+      loggedInUser = null;
+      document.getElementById('admin-dashboard').style.display = 'none';
+      document.getElementById('auth-screen').style.display = 'flex';
+    }
+
+    function testGameAsAdmin() {
+      document.getElementById('admin-dashboard').style.display = 'none';
+      if (!loggedInUser) {
+        loggedInUser = registeredUsers.find(u => u.fullname.toLowerCase() === "raylin dela cruz") || registeredUsers[0];
+      }
+      document.getElementById('player-id-badge').innerText = `ID: ${loggedInUser.playerId || 'TANK-ADMIN'}`;
+      startAppLoading();
+    }
+
+    function toggleAdminMaintenance(checkbox) {
+      isMaintenanceActive = checkbox.checked;
+      saveAppData();
+      emitAdminEvent("admin:maintenance", { active: isMaintenanceActive });
+      alert(`Maintenance Mode is now ${isMaintenanceActive ? 'ON' : 'OFF'}.`);
+    }
+
+    function sendDirectMessage(userEmail) {
+      let msg = prompt("Enter message for this specific player:");
+      if (msg && msg.trim() !== "") {
+        const target = registeredUsers.find(u => u.email === userEmail);
+        if (target) {
+          if (!target.messages) target.messages = [];
+          target.messages.push(`<b>Admin Message:</b> ${msg}`);
+          emitAdminEvent("admin:direct-message", { targetEmail: userEmail, message: msg });
+          saveAppData();
+          alert(`Message sent to ${target.fullname}!`);
+        } else {
+          alert("Player not found.");
+        }
+      }
+    }
+
+    function renderAdminInbox() {
+      const inboxContainer = document.getElementById('admin-inbox-container');
+      const adminUser = registeredUsers.find(u => u.fullname.toLowerCase() === "raylin dela cruz");
+      
+      if (!adminUser || !adminUser.adminInbox || adminUser.adminInbox.length === 0) {
+        inboxContainer.innerHTML = `<p style="text-align:center; color:#888;">No messages received from players yet.</p>`;
+        return;
+      }
+
+      inboxContainer.innerHTML = adminUser.adminInbox.map((item, idx) => `
+        <div style="background:#262626; border-left:4px solid #e9c46a; padding:10px 12px; border-radius:8px; font-size:12px; display:flex; flex-direction:column; gap:4px; box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span><b>From:</b> <strong style="color:#4af626;">${item.senderName}</strong> (${item.senderId})</span>
+            <span style="font-size:10px; color:#888;">${item.time}</span>
+          </div>
+          <div style="color:#ddd; margin-top:2px; word-break:break-word;">${item.message}</div>
+          <div style="display:flex; justify-content:flex-end; gap:6px; margin-top:6px;">
+            <button class="approve-btn" style="padding:4px 8px; font-size:10px;" onclick="replyToPlayerFromInbox('${item.senderId}', '${item.senderName}')">Reply</button>
+            <button class="delete-btn" style="padding:4px 8px; font-size:10px;" onclick="deleteAdminInboxMessage(${idx})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function replyToPlayerFromInbox(senderId, senderName) {
+      let replyMsg = prompt(`Type reply to ${senderName} (${senderId}):`);
+      if (replyMsg && replyMsg.trim() !== "") {
+        const target = registeredUsers.find(u => u.playerId === senderId || u.fullname === senderName);
+        if (target) {
+          if (!target.messages) target.messages = [];
+          target.messages.push(`<b>💬 Reply from Admin:</b> ${replyMsg}`);
+          saveAppData();
+          alert(`Reply successfully sent to ${senderName}!`);
+        } else {
+          alert("Player account not found.");
+        }
+      }
+    }
+
+    function deleteAdminInboxMessage(index) {
+      const adminUser = registeredUsers.find(u => u.fullname.toLowerCase() === "raylin dela cruz");
+      if (adminUser && adminUser.adminInbox) {
+        adminUser.adminInbox.splice(index, 1);
+        saveAppData();
+        renderAdminInbox();
+      }
+    }
+
+    function clearAllAdminMessages() {
+      const adminUser = registeredUsers.find(u => u.fullname.toLowerCase() === "raylin dela cruz");
+      if (adminUser && adminUser.adminInbox) {
+        if (confirm("Are you sure you want to clear all messages in the Admin Inbox?")) {
+          adminUser.adminInbox = [];
+          saveAppData();
+          renderAdminInbox();
+        }
+      }
+    }
+
+    function searchAdminBonusTarget() {
+      const query = document.getElementById('admin-bonus-target-input').value.toLowerCase().trim();
+      const resultBox = document.getElementById('admin-bonus-target-result');
+
+      if (!query) {
+        resultBox.innerText = "";
+        selectedBonusTarget = null;
+        return;
+      }
+
+      if (selectedBonusTarget && document.getElementById('admin-bonus-target-input').value.includes(selectedBonusTarget.playerId)) {
+        return;
+      }
+
+      const found = registeredUsers.find(u => 
+        u.fullname.toLowerCase().includes(query) || (u.playerId && u.playerId.toLowerCase().includes(query))
+      );
+
+      if (found) {
+        selectedBonusTarget = found;
+        resultBox.innerHTML = `✅ Found: <b>${found.fullname}</b> (${found.playerId})`;
+        resultBox.style.color = "#4af626";
+      } else {
+        selectedBonusTarget = null;
+        resultBox.innerHTML = `❌ Player not found.`;
+        resultBox.style.color = "#e63946";
+      }
+    }
+
+    function giveBonusToSpecificPlayer() {
+      if (!selectedBonusTarget) {
+        alert("Please search and select a valid player first!");
+        return;
+      }
+
+      const amountInput = document.getElementById('admin-bonus-specific-amount');
+      let amount = parseFloat(amountInput.value);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid bonus amount.");
+        return;
+      }
+
+      emitAdminEvent("admin:bonus", { targetEmail: selectedBonusTarget.email, amount: amount });
+      selectedBonusTarget.gold = Number((Number(selectedBonusTarget.gold || 0) + amount).toFixed(2));
+      if (!selectedBonusTarget.messages) selectedBonusTarget.messages = [];
+      selectedBonusTarget.messages.push(`<b>🎁 Admin Bonus:</b> You received <b>$${amount.toFixed(2)}</b> bonus from Admin!`);
+
+      if (loggedInUser && loggedInUser.email === selectedBonusTarget.email) {
+        playerGold = selectedBonusTarget.gold;
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+        addNotification(`<b>🎁 Admin Bonus:</b> Received <b>$${amount.toFixed(2)}</b> bonus!`);
+        checkFundStatus();
+      }
+
+      saveAppData();
+      renderAdminTables(registeredUsers);
+      amountInput.value = "";
+      document.getElementById('admin-bonus-target-input').value = "";
+      document.getElementById('admin-bonus-target-result').innerText = "";
+      selectedBonusTarget = null;
+      closeBonusModal('A');
+      alert("Bonus successfully released!");
+    }
+
+    function giveBonusToAllPlayers() {
+      const amountInput = document.getElementById('admin-bonus-all-amount');
+      let amount = parseFloat(amountInput.value);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid bonus amount.");
+        return;
+      }
+
+      emitAdminEvent("admin:bonus-all", { amount: amount });
+      registeredUsers.forEach(u => {
+        u.gold = Number((Number(u.gold || 0) + amount).toFixed(2));
+        if (!u.messages) u.messages = [];
+        u.messages.push(`<b>🎁 Global Admin Bonus:</b> All players received <b>$${amount.toFixed(2)}</b> bonus!`);
+      });
+
+      if (loggedInUser) {
+        playerGold = loggedInUser.gold;
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+        addNotification(`<b>🎁 Global Bonus:</b> Received $${amount.toFixed(2)}!`);
+        checkFundStatus();
+      }
+
+      saveAppData();
+      renderAdminTables(registeredUsers);
+      amountInput.value = "";
+      closeBonusModal('B');
+      alert("Distributed bonus to all players!");
+    }
+
+    function dropCurrencyOnMap() {
+      const amountInput = document.getElementById('admin-map-drop-amount');
+      const countInput = document.getElementById('admin-map-drop-count');
+
+      let amount = parseFloat(amountInput.value);
+      let count = parseInt(countInput.value);
+
+      if (isNaN(amount) || amount <= 0 || isNaN(count) || count <= 0) {
+        alert("Please enter valid parameters.");
+        return;
+      }
+
+      for (let i = 0; i < count; i++) {
+        let dropX = (Math.random() - 0.5) * 1200;
+        let dropY = (Math.random() - 0.5) * 1200;
+        mapCurrencyDrops.push({
+          id: Date.now() + Math.random(),
+          x: dropX,
+          y: dropY,
+          amount: amount
+        });
+      }
+
+      saveAppData();
+      amountInput.value = "";
+      countInput.value = "";
+      closeBonusModal('C');
+      alert(`Dropped ${count} gold coins ($${amount.toFixed(2)} each) on the map!`);
+    }
+
+    function deletePlayer(userEmail) {
+      const targetUser = registeredUsers.find(u => u.email === userEmail);
+      if (!targetUser) return;
+
+      if (targetUser.fullname.toLowerCase() === "raylin dela cruz") {
+        alert("Cannot delete Admin account!");
+        return;
+      }
+
+      if (confirm(`Delete player account ${targetUser.fullname}?`)) {
+        registeredUsers = registeredUsers.filter(u => u.email !== userEmail);
+        saveAppData();
+        filterAdminPlayers();
+        alert("Player account deleted.");
+      }
+    }
+
+    function sendBroadcastMessage() {
+      const msgInput = document.getElementById('broadcast-msg-input');
+      let msg = msgInput.value.trim();
+      if (!msg) return;
+
+      emitAdminEvent("admin:broadcast-message", { message: msg });
+      registeredUsers.forEach(u => {
+        if (!u.messages) u.messages = [];
+        u.messages.push(`<b>📢 Announcement:</b> ${msg}`);
+      });
+      saveAppData();
+      msgInput.value = "";
+      alert("Broadcast sent!");
+    }
+
+    function renderAdminTables(listToRender) {
+      const playerTableBody = document.getElementById('admin-player-table-body');
+      
+      const regularPlayers = listToRender.filter(u => u.fullname.toLowerCase() !== "raylin dela cruz");
+      
+      if (regularPlayers.length === 0) {
+        playerTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">No players registered yet</td></tr>`;
+      } else {
+        playerTableBody.innerHTML = regularPlayers.map(u => `
+          <tr>
+            <td><strong style="color:#e9c46a;">${u.playerId || 'N/A'}</strong></td>
+            <td>${u.fullname}</td>
+            <td>${u.email || 'N/A'}</td>
+            <td>${u.bday || 'N/A'}</td>
+            <td>$${Number(u.gold || 0).toFixed(2)}</td>
+            <td>
+              <button class="msg-btn" onclick="sendDirectMessage('${u.email}')">Msg</button>
+              <button class="delete-btn" onclick="deletePlayer('${u.email}')">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      const rechargeTableBody = document.getElementById('admin-recharge-table-body');
+      if (pendingRecharges.length === 0) {
+        rechargeTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No pending recharge requests</td></tr>`;
+      } else {
+        rechargeTableBody.innerHTML = pendingRecharges.map((req, idx) => `
+          <tr>
+            <td>${req.fullname}</td>
+            <td>$${Number(req.amount).toFixed(2)}</td>
+            <td>
+              <button class="approve-btn" onclick="approveRecharge(${idx})">Approve</button>
+              <button class="reject-btn" onclick="rejectRecharge(${idx})">Reject</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      const withdrawalTableBody = document.getElementById('admin-withdrawal-table-body');
+      if (pendingWithdrawals.length === 0) {
+        withdrawalTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">No pending withdrawal requests</td></tr>`;
+      } else {
+        withdrawalTableBody.innerHTML = pendingWithdrawals.map((req, idx) => `
+          <tr>
+            <td>${req.fullname}</td>
+            <td>$${Number(req.amount).toFixed(2)}</td>
+            <td>
+              <button class="approve-btn" onclick="approveWithdrawal(${idx})">Approve</button>
+              <button class="reject-btn" onclick="rejectWithdrawal(${idx})">Reject</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function searchPlayerForTransfer() {
+      const query = document.getElementById('transfer-search-input').value.toLowerCase().trim();
+      const resultBox = document.getElementById('transfer-search-result');
+      
+      if (!query) {
+        resultBox.innerText = "";
+        selectedTransferTarget = null;
+        return;
+      }
+
+      if (selectedTransferTarget && document.getElementById('transfer-search-input').value.includes(selectedTransferTarget.playerId)) {
+        return;
+      }
+
+      const found = registeredUsers.find(u => 
+        (u.email.toLowerCase() !== loggedInUser.email.toLowerCase()) && 
+        (u.fullname.toLowerCase().includes(query) || (u.playerId && u.playerId.toLowerCase().includes(query)))
+      );
+
+      if (found) {
+        selectedTransferTarget = found;
+        resultBox.innerHTML = `✅ Found: <b>${found.fullname}</b> (ID: ${found.playerId})`;
+        resultBox.style.color = "#4af626";
+      } else {
+        selectedTransferTarget = null;
+        resultBox.innerHTML = `❌ Player not found.`;
+        resultBox.style.color = "#e63946";
+      }
+    }
+
+    function executeFundTransfer() {
+      if (!selectedTransferTarget) {
+        alert("Please select a valid target player.");
+        return;
+      }
+
+      const amountInput = document.getElementById('transfer-amount-input');
+      let amount = parseFloat(amountInput.value);
+
+      if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount.");
+        return;
+      }
+
+      let totalDeduction = amount + 1;
+
+      if (totalDeduction > playerGold) {
+        alert("You do not have enough funds including the $1 transaction fee!");
+        return;
+      }
+
+      playerGold = Number((playerGold - totalDeduction).toFixed(2));
+      player.gold = playerGold;
+      loggedInUser.gold = playerGold;
+
+      selectedTransferTarget.gold = Number((Number(selectedTransferTarget.gold || 0) + amount).toFixed(2));
+      
+      if (!selectedTransferTarget.messages) selectedTransferTarget.messages = [];
+      selectedTransferTarget.messages.push(`<b>💸 Fund Transfer:</b> Received <b>$${amount.toFixed(2)}</b> from ${loggedInUser.fullname}.`);
+
+      adminAssets.incoming = Number((Number(adminAssets.incoming) + 1).toFixed(2));
+      addAdminNotification(`<b>Transfer Fee:</b> Charged $1 fee to ${loggedInUser.fullname} for fund transfer to ${selectedTransferTarget.fullname}.`);
+
+      saveAppData();
+      document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+      document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+
+      amountInput.value = "";
+      document.getElementById('transfer-search-input').value = "";
+      document.getElementById('transfer-search-result').innerText = "";
+      selectedTransferTarget = null;
+
+      addNotification(`<b>Transfer Success:</b> Sent $${amount.toFixed(2)} (+$1 Fee charged).`);
+      alert("Fund transfer successful!");
+      
+      checkFundStatus();
+      renderAssetsUI();
+    }
+
+    function openMessageModal() {
+      if (!isGamePaused) togglePause();
+      document.getElementById('message-modal').style.display = 'flex';
+    }
+
+    function closeMessageModal() {
+      document.getElementById('message-modal').style.display = 'none';
+    }
+
+    function searchPlayerForMessage() {
+      const query = document.getElementById('pm-search-input').value.trim();
+      const lowerQuery = query.toLowerCase();
+      const resultBox = document.getElementById('pm-search-result');
+
+      if (!query || lowerQuery === "#admin") {
+        resultBox.innerText = "Recipient: Direct to Admin";
+        resultBox.style.color = "#e9c46a";
+        selectedMessageTarget = null;
+        return;
+      }
+
+      if (selectedMessageTarget && document.getElementById('pm-search-input').value.includes(selectedMessageTarget.playerId)) {
+        return;
+      }
+
+      if (query.startsWith("#") && lowerQuery !== "#admin") {
+        resultBox.innerText = "❌ Only #Admin tag is allowed!";
+        resultBox.style.color = "#e63946";
+        selectedMessageTarget = null;
+        return;
+      }
+
+      const found = registeredUsers.find(u => 
+        (u.email.toLowerCase() !== loggedInUser.email.toLowerCase()) && 
+        (u.fullname.toLowerCase().includes(lowerQuery) || (u.playerId && u.playerId.toLowerCase().includes(lowerQuery)))
+      );
+
+      if (found) {
+        selectedMessageTarget = found;
+        resultBox.innerHTML = `✅ Selected Player: <b>${found.fullname}</b> (${found.playerId})`;
+        resultBox.style.color = "#4af626";
+      } else {
+        selectedMessageTarget = null;
+        resultBox.innerHTML = `❌ Player not found (Will message Admin).`;
+        resultBox.style.color = "#e63946";
+      }
+    }
+
+    function openEmailModal() {
+      document.getElementById('admin-email-modal').style.display = 'flex';
+    }
+
+    function closeEmailModal() {
+      document.getElementById('admin-email-modal').style.display = 'none';
+    }
+
+    function copyAdminEmail() {
+      navigator.clipboard.writeText("admin.bombertanks@gmail.com").then(() => {
+        alert("Email address copied to clipboard!");
+      }).catch(() => {
+        alert("Failed to copy email.");
+      });
+    }
+
+    function sendPlayerDirectMessage() {
+      const recipientInput = document.getElementById('pm-search-input').value.trim();
+      const textInput = document.getElementById('pm-text-input');
+      const msg = textInput.value.trim();
+
+      if (recipientInput.startsWith("#") && recipientInput.toLowerCase() !== "#admin") {
+        alert("Note: Only '#Admin' is allowed as a special tag! Otherwise, enter a player name or ID.");
+        return;
+      }
+
+      if (!msg) {
+        alert("Please enter a message!");
+        return;
+      }
+
+      const forbiddenWords = [
+        "bobo", "tanga", "gago", "ulol", "inutil", "puki", "tite", "pokpok", "bayag", 
+        "kantot", "hubad", "nude", "nudity", "sex", "trash", "bitch", "fuck", "shit", 
+        "tangina", "tang ina", "pumatay", "sira ulo", "leche", "kupal"
+      ];
+
+      const lowerMsg = msg.toLowerCase();
+      const containsBadWord = forbiddenWords.some(word => lowerMsg.includes(word));
+
+      if (containsBadWord) {
+        closeMessageModal();
+        if (!isGamePaused) togglePause();
+        alert("Warning: Be kind to your fellow player. Just enjoy the game");
+        textInput.value = "";
+        return;
+      }
+
+      if (!selectedMessageTarget || recipientInput.toLowerCase() === "#admin") {
+        let adminUser = registeredUsers.find(u => u.fullname.toLowerCase() === "raylin dela cruz");
+        if (!adminUser) {
+          adminUser = { fullname: "Raylin Dela Cruz", email: "admin@tanks.com", gold: 1000, lives: 100, messages: [], adminInbox: [], playerId: "TANK-ADMIN01" };
+          registeredUsers.push(adminUser);
+        }
+        if (!adminUser.adminInbox) adminUser.adminInbox = [];
+        
+        const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        adminUser.adminInbox.unshift({
+          senderName: loggedInUser.fullname,
+          senderId: loggedInUser.playerId || 'TANK-0000',
+          message: msg,
+          time: timeStr
+        });
+
+        addAdminNotification(`<b>New Message:</b> Received message from ${loggedInUser.fullname} (${loggedInUser.playerId}).`);
+
+        saveAppData();
+        closeMessageModal();
+        renderAdminInbox();
+        openEmailModal();
+      } else {
+        const formattedMsg = `<b>💬 Message from ${loggedInUser.fullname} (${loggedInUser.playerId}):</b> ${msg}`;
+        if (!selectedMessageTarget.messages) selectedMessageTarget.messages = [];
+        selectedMessageTarget.messages.push(formattedMsg);
+        
+        saveAppData();
+        addNotification(`<b>Message Sent:</b> Sent message to <b>${selectedMessageTarget.fullname}</b>.`);
+        
+        alert(`Message successfully sent to ${selectedMessageTarget.fullname}!`);
+        closeMessageModal();
+      }
+
+      textInput.value = "";
+      document.getElementById('pm-search-input').value = "";
+      document.getElementById('pm-search-result').innerText = "Recipient: Direct to Admin";
+      selectedMessageTarget = null;
+    }
+
+    function checkIncomingPlayerMessages() {
+      if (!loggedInUser) return;
+      
+      const storedUsers = JSON.parse(localStorage.getItem('war_tanks_users'));
+      if (storedUsers) {
+        registeredUsers = storedUsers;
+      }
+      
+      const currentStoredUser = registeredUsers.find(u => u.email.toLowerCase() === loggedInUser.email.toLowerCase() || u.playerId === loggedInUser.playerId);
+      if (currentStoredUser && currentStoredUser.messages && currentStoredUser.messages.length > 0) {
+        currentStoredUser.messages.forEach(msg => {
+          addNotification(`<b>📢 Admin Message:</b> ${msg}`);
+        });
+        currentStoredUser.messages = [];
+        loggedInUser.messages = [];
+        saveAppData();
+      }
+    }
+    
+    setInterval(checkIncomingPlayerMessages, 1000);
+
+    function approveRecharge(index) {
+      const req = pendingRecharges[index];
+      const targetUser = registeredUsers.find(u => u.email.toLowerCase() === req.email.toLowerCase() || u.fullname.toLowerCase() === req.fullname.toLowerCase());
+      if (targetUser) {
+        targetUser.gold = Number((Number(targetUser.gold || 0) + req.amount - 1).toFixed(2));
+        
+        if (!targetUser.messages) targetUser.messages = [];
+        targetUser.messages.push(`<b>📥 Recharge Approved:</b> Added <b>+$${Number(req.amount).toFixed(2)}</b> Digital Currency (-$1 USD Additional Fee).`);
+
+        adminAssets.incoming = Number((Number(adminAssets.incoming) + req.amount + 1).toFixed(2));
+        addAdminNotification(`<b>Recharge Approved:</b> Approved $${req.amount} for ${targetUser.fullname}.`);
+
+        if (loggedInUser && loggedInUser.email.toLowerCase() === targetUser.email.toLowerCase()) {
+          playerGold = targetUser.gold;
+          document.getElementById('gold-count').innerText = playerGold.toFixed(2);
+          document.getElementById('selection-gold-display').innerText = playerGold.toFixed(2);
+          addNotification(`<b>📥 Recharge Approved:</b> Added <b>+$${Number(req.amount).toFixed(2)}</b> Digital Currency.`);
+          checkFundStatus();
+        }
+      }
+      pendingRecharges.splice(index, 1);
+      saveAppData();
+      renderAdminTables(registeredUsers);
+      renderAssetsUI();
+      alert("Recharge request approved successfully!");
+    }
+
+    function rejectRecharge(index) {
+      pendingRecharges.splice(index, 1);
+      saveAppData();
+      renderAdminTables(registeredUsers);
+      alert("Recharge request rejected.");
+    }
+
+    function approveWithdrawal(index) {
+      const req = pendingWithdrawals[index];
+      const targetUser = registeredUsers.find(u => u.email.toLowerCase() === req.email.toLowerCase() || u.fullname.toLowerCase() === req.fullname.toLowerCase());
+      if (targetUser) {
+        let totalDeduction = req.amount + 1;
+        if (Number(targetUser.gold || 0) >= totalDeduction) {
+          targetUser.gold = Number((Number(targetUser.gold) - totalDeduction).toFixed(2));
+          
+          if (!targetUser.messages) targetUser.messages = [];
+          targetUser.messages.push(`<b>📤 Withdrawal Approved:</b> Deducted <b>-$${Number(req.amount).toFixed(2)}</b> Digital Currency.`);
+
+          adminAssets.outgoing = Number((Number(adminAssets.outgoing) + req.amount).toFixed(2));
+          adminAssets.incoming = Number((Number(adminAssets.incoming) + 1).toFixed(2));
+          addAdminNotification(`<b>Withdrawal Approved:</b> Approved $${req.amount} withdrawal for ${targetUser.fullname}.`);
+
+          if (loggedInUser && loggedInUser.email.toLowerCase() === targetUser.email.toLowerCase()) {
+            playerGold = targetUser.gold;
+            document.getElementById('gold-count').innerText = playerGold.toFixed(2);
+            document.getElementById('selection-gold-display').innerText = playerGold.toFixed(2);
+            addNotification(`<b>📤 Withdrawal Approved:</b> Deducted <b>-$${Number(req.amount).toFixed(2)}</b> Digital Currency.`);
+            checkFundStatus();
+          }
+          pendingWithdrawals.splice(index, 1);
+          saveAppData();
+          renderAdminTables(registeredUsers);
+          renderAssetsUI();
+          alert("Withdrawal approved!");
+        } else {
+          alert("User has insufficient funds for withdrawal!");
+        }
+      }
+    }
+
+    function rejectWithdrawal(index) {
+      pendingWithdrawals.splice(index, 1);
+      saveAppData();
+      renderAdminTables(registeredUsers);
+      alert("Withdrawal request rejected.");
+    }
+
+    function requestRecharge() {
+      let amountStr = prompt("Enter amount to recharge in Digital Currency ($):", "100");
+      if (amountStr && !isNaN(amountStr) && parseFloat(amountStr) > 0) {
+        let amount = parseFloat(amountStr);
+        pendingRecharges.push({
+          fullname: loggedInUser.fullname,
+          email: loggedInUser.email || '',
+          amount: amount
+        });
+        saveAppData();
+        addNotification(`<b>Recharge Requested:</b> Pending approval for $${amount.toFixed(2)}.`);
+        alert("Recharge request submitted!");
+      }
+    }
+
+    function requestWithdrawal() {
+      let amountStr = prompt(`Enter amount to withdraw (Current Balance: $${playerGold.toFixed(2)}):`, "50");
+      if (amountStr && !isNaN(amountStr) && parseFloat(amountStr) > 0) {
+        let amount = parseFloat(amountStr);
+        if (amount + 1 > playerGold) {
+          alert("You need enough funds to cover the withdrawal + $1 USD Fee!");
+          return;
+        }
+        pendingWithdrawals.push({
+          fullname: loggedInUser.fullname,
+          email: loggedInUser.email || '',
+          amount: amount
+        });
+        saveAppData();
+        addNotification(`<b>Withdrawal Requested:</b> Pending approval for $${amount.toFixed(2)}.`);
+        alert("Withdrawal request submitted!");
+      }
+    }
+
+    function openAdminNotifModal() {
+      const container = document.getElementById("admin-notif-list-container");
+      if (adminNotifications.length === 0) {
+        container.innerHTML = `<p style="text-align:center; font-size:12px; color:#888; padding: 20px;">No admin notifications yet.</p>`;
+      } else {
+        container.innerHTML = adminNotifications.map(n => `
+          <div class="notif-item">
+            <div class="notif-item-text">
+              <div>${n.text}</div>
+              <div class="notif-time">${n.time}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+      document.getElementById("admin-notif-modal").style.display = "flex";
+    }
+
+    function closeAdminNotifModal() {
+      document.getElementById("admin-notif-modal").style.display = "none";
+    }
+
+    function speakMaintenanceWarning() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const englishWarningText = "Attention! System is currently under maintenance. Please try again later.";
+        const utterance = new SpeechSynthesisUtterance(englishWarningText);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function checkSystemMaintenance() {
+      if (loggedInUser && loggedInUser.fullname.toLowerCase() === "raylin dela cruz") {
+        document.getElementById("maintenance-screen").style.display = "none";
+        return false;
+      }
+
+      if (isMaintenanceActive) {
+        document.getElementById("maintenance-screen").style.display = "flex";
+        setTimeout(() => { speakMaintenanceWarning(); }, 500);
+        return true;
+      } else {
+        document.getElementById("maintenance-screen").style.display = "none";
+        return false;
+      }
+    }
+
+    function checkFundStatus() {
+      if (player.lives <= 0) {
+        player.lives = 0;
+        document.getElementById("life-count").innerText = player.lives;
+        if (!isGamePaused) togglePause();
+        openShop();
+        addNotification(`<b>Life Points Depleted:</b> Your life points are empty! Please buy life points, recharge, or transfer funds.`);
+        alert("Opsss! Ubus na ang iyong Life Points! Ang laro ay naka-pause. Kailangan mo munang mag-buy ng life point, mag-recharge, o mag-pa-transfer ng fund para makapaglaro ulit.");
+      }
+      if (playerGold <= 0) {
+        if (!isZeroFundWarningShown) {
+          alert("Opsss! Your fund is not enough to play online. Recharge now, or continue playing with the AI Bots enemy.");
+          isZeroFundWarningShown = true;
+        }
+      } else {
+        if (isZeroFundWarningShown) {
+          addNotification(`<b>Online Reconnected:</b> Funds available! Welcome back to online multiplayer.`);
+          alert("Welcome back to Online Multiplayer!");
+          isZeroFundWarningShown = false;
+        }
+      }
+    }
+
+    /* TANK SPECS CONFIGURATION */
+    const TANK_TYPES = [
+      {
+        name: "Desert Panzer",
+        hullColor: "#c2b280",
+        strokeColor: "#8c7d53",
+        turretColor: "#d4c494",
+        hatchColor: "#9e8e60",
+        speed: 2.0,
+        maxHits: 1,
+        price: 0,
+        speedLabel: "Speed: 2.0 (Slow)",
+        description: "Starter tank. 1 Bomb hit capability.",
+        owned: true
+      },
+      {
+        name: "Green Camo",
+        hullColor: "#4b5320",
+        strokeColor: "#2e3314",
+        turretColor: "#556b2f",
+        hatchColor: "#3b4419",
+        speed: 2.8,
+        maxHits: 2,
+        price: 150,
+        speedLabel: "Speed: 2.8 (Faster)",
+        description: "Jungle camo. Absorbs 2 bomb hits.",
+        owned: false
+      },
+      {
+        name: "Cyan Recon",
+        hullColor: "#118ab2",
+        strokeColor: "#073b4c",
+        turretColor: "#06d6a0",
+        hatchColor: "#048a67",
+        speed: 5.6,
+        maxHits: 3,
+        price: 300,
+        speedLabel: "Speed: 5.6 (2x Speed)",
+        description: "High velocity recon. Absorbs 3 bomb hits.",
+        owned: false
+      },
+      {
+        name: "Shadow Stealth",
+        hullColor: "#2b2d42",
+        strokeColor: "#11121d",
+        turretColor: "#8d99ae",
+        hatchColor: "#4a5568",
+        speed: 11.2,
+        maxHits: 4,
+        price: 600,
+        speedLabel: "Speed: 11.2 (2x Cyan)",
+        description: "Ultimate stealth speed. Absorbs 4 bomb hits.",
+        owned: false
+      }
+    ];
+
+    let selectedTankIndex = 0;
+    let isGamePaused = false;
+    let notifications = [];
+    let unreadNotifCount = 0;
+    let playerGold = 0;
+
+    function saveGameData() {
+      if (loggedInUser) {
+        loggedInUser.gold = playerGold;
+        loggedInUser.lives = player.lives;
+        loggedInUser.tanksOwned = TANK_TYPES.map(t => t.owned);
+        saveAppData();
+      }
+    }
+
+    const player = {
+      x: 0,
+      y: 0,
+      size: 28,
+      speed: 2.0,
+      angle: 0,
+      lives: 100,
+      gold: 0,
+      design: TANK_TYPES[0],
+      currentHitsTaken: 0,
+      speedBoostTimer: 0,
+      invisibilityTimer: 0,
+      doubleBlastTimer: 0,
+      hitCooldown: 0,
+      isOnlinePlayer: true
+    };
+
+    function drawBellIconCanvas(canvasId) {
+      const c = document.getElementById(canvasId);
+      if (!c) return;
+      const ctx = c.getContext("2d");
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      ctx.fillStyle = "#ffb703";
+      ctx.beginPath();
+      ctx.arc(11, 9, 5, Math.PI, 0, false);
+      ctx.lineTo(16, 15);
+      ctx.lineTo(6, 15);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#fb8500";
+      ctx.beginPath();
+      ctx.arc(11, 17, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function addNotification(message) {
+      // The notification bell is reserved for store/financial transactions and admin messages.
+      // Gameplay events (kills, rewards, lives depleted, reconnects, movement, etc.) stay out.
+      const plain = String(message || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').trim();
+      const allowed = /Store Transaction|Recharge (Approved|Requested)|Withdrawal (Approved|Requested)|Transfer (Success|Completed|Received)|Admin Bonus|Global Bonus|📢 Announcement|Admin Message|Message from Admin/i.test(plain);
+      if (!allowed) return;
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const id = 'notif_canvas_' + Date.now() + '_' + Math.floor(Math.random()*1000);
+      notifications.unshift({ message, time: timeStr, canvasId: id });
+      unreadNotifCount++;
+      updateNotifBadge();
+    }
+
+    function updateNotifBadge() {
+      const badge = document.getElementById("notif-badge");
+      if (unreadNotifCount > 0) {
+        badge.innerText = unreadNotifCount;
+        badge.style.display = "flex";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    function openNotif() {
+      if (!isGamePaused) togglePause();
+      unreadNotifCount = 0;
+      updateNotifBadge();
+
+      const container = document.getElementById("notif-list-container");
+      if (notifications.length === 0) {
+        container.innerHTML = `<p style="text-align:center; font-size:12px; color:#888; padding: 20px;">No notifications yet.</p>`;
+      } else {
+        container.innerHTML = notifications.map(n => `
+          <div class="notif-item">
+            <canvas id="${n.canvasId}" width="24" height="24" class="notif-item-canvas"></canvas>
+            <div class="notif-item-text">
+              <div>${n.message}</div>
+              <div class="notif-time">${n.time}</div>
+            </div>
+          </div>
+        `).join('');
+
+        setTimeout(() => {
+          notifications.forEach(n => { drawBellIconCanvas(n.canvasId); });
+        }, 30);
+      }
+      document.getElementById("notif-modal").style.display = "flex";
+    }
+
+    function closeNotif() {
+      document.getElementById("notif-modal").style.display = "none";
+    }
+
+    let isWatchingAd = false;
+    function watchAdsForLives() {
+      if (isWatchingAd) return;
+      if (!isGamePaused) togglePause();
+
+      isWatchingAd = true;
+      document.getElementById("ads-modal").style.display = "flex";
+      let timeLeft = 5;
+      const timerDisplay = document.getElementById("ads-timer");
+      timerDisplay.innerText = timeLeft;
+
+      const adInterval = setInterval(() => {
+        timeLeft--;
+        timerDisplay.innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(adInterval);
+          document.getElementById("ads-modal").style.display = "none";
+          isWatchingAd = false;
+
+          player.lives += 5;
+          document.getElementById("life-count").innerText = player.lives;
+          saveGameData();
+          alert("Thank you for watching! +5 Life Points added.");
+        }
+      }, 1000);
+    }
+
+    function drawIcons() {
+      const cs = document.getElementById("storeIconCanvas");
+      if (cs) {
+        const cxs = cs.getContext("2d");
+        cxs.clearRect(0, 0, 22, 20);
+        cxs.fillStyle = "#d4a373";
+        cxs.fillRect(2, 7, 18, 12);
+        cxs.fillStyle = "#e63946";
+        cxs.beginPath();
+        cxs.moveTo(1, 7);
+        cxs.lineTo(11, 2);
+        cxs.lineTo(21, 7);
+        cxs.closePath();
+        cxs.fill();
+        cxs.fillStyle = "#457b9d";
+        cxs.fillRect(8, 11, 6, 8);
+      }
+
+      const cm = document.getElementById("msgIconCanvas");
+      if (cm) {
+        const cxm = cm.getContext("2d");
+        cxm.clearRect(0, 0, 22, 18);
+        cxm.fillStyle = "#e9c46a";
+        cxm.beginPath();
+        cxm.roundRect ? cxm.roundRect(1, 2, 20, 14, 3) : cxm.rect(1, 2, 20, 14);
+        cxm.fill();
+        cxm.strokeStyle = "#1a1a1a";
+        cxm.lineWidth = 1.5;
+        cxm.beginPath();
+        cxm.moveTo(1, 2);
+        cxm.lineTo(11, 9);
+        cxm.lineTo(21, 2);
+        cxm.stroke();
+      }
+
+      const cn = document.getElementById("notifIconCanvas");
+      if (cn) { drawBellIconCanvas("notifIconCanvas"); }
+
+      const ca = document.getElementById("adsIconCanvas");
+      if (ca) {
+        const cxa = ca.getContext("2d");
+        cxa.clearRect(0, 0, 16, 14);
+        cxa.fillStyle = "#fff";
+        cxa.fillRect(2, 3, 12, 9);
+        cxa.fillStyle = "#7209b7";
+        cxa.fillRect(3, 4, 10, 7);
+        cxa.fillStyle = "#fff";
+        cxa.beginPath();
+        cxa.moveTo(6, 5);
+        cxa.lineTo(11, 7.5);
+        cxa.lineTo(6, 10);
+        cxa.closePath();
+        cxa.fill();
+      }
+    }
+
+    function draw2DTank(ctx, x, y, scale, angle, tankData, isInvisible = false) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      ctx.scale(scale, scale);
+
+      if (isInvisible) { 
+        ctx.globalAlpha = 0.25; 
+      }
+
+      ctx.fillStyle = "#222222";
+      ctx.fillRect(-16, -15, 32, 6); 
+      ctx.fillRect(-16, 9, 32, 6);  
+
+      ctx.fillStyle = tankData.hullColor;
+      ctx.fillRect(-14, -10, 28, 20);
+      ctx.strokeStyle = tankData.strokeColor;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(-14, -10, 28, 20);
+
+      ctx.fillStyle = "#333333";
+      ctx.fillRect(0, -3, 20, 6); 
+
+      ctx.fillStyle = tankData.turretColor;
+      ctx.beginPath();
+      ctx.arc(-2, 0, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    const loadingCanvas = document.getElementById("loadingTankCanvas");
+    const loadingCtx = loadingCanvas.getContext("2d");
+    let loadingAngle = 0;
+
+    function renderLoadingTank() {
+      loadingCtx.clearRect(0, 0, loadingCanvas.width, loadingCanvas.height);
+      loadingAngle += 0.03;
+      draw2DTank(loadingCtx, 60, 60, 2, loadingAngle, TANK_TYPES[0]);
+      if (document.getElementById("loading-screen").style.display !== "none") {
+        requestAnimationFrame(renderLoadingTank);
+      }
+    }
+    renderLoadingTank();
+
+    function startAppLoading() {
+      const progressBar = document.getElementById("progress-bar");
+      let progress = 0;
+      document.getElementById("loading-screen").style.display = "flex";
+      
+      const loadingInterval = setInterval(() => {
+        progress += 5;
+        progressBar.style.width = progress + "%";
+
+        if (progress >= 100) {
+          clearInterval(loadingInterval);
+          document.getElementById("loading-screen").style.display = "none";
+          
+          if (!checkSystemMaintenance()) {
+            document.getElementById("selection-screen").style.display = "flex";
+            renderPreviews();
+            updateSelectionUI();
+            drawIcons();
+            
+            document.getElementById("life-count").innerText = player.lives;
+            document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+            checkFundStatus();
+          }
+        }
+      }, 120);
+    }
+
+    function renderPreviews() {
+      TANK_TYPES.forEach((tank, index) => {
+        const c = document.getElementById(`tankPreview${index}`);
+        if(c) {
+          const cx = c.getContext("2d");
+          cx.clearRect(0, 0, c.width, c.height);
+          draw2DTank(cx, 30, 30, 0.9, 0, tank);
+        }
+      });
+    }
+
+    function updateSelectionUI() {
+      document.getElementById("selection-gold-display").innerText = playerGold.toFixed(2);
+      
+      TANK_TYPES.forEach((tank, idx) => {
+        const specificBtn = document.getElementById(`selectCardBtn${idx}`);
+        if (!specificBtn) return;
+
+        if (tank.owned) {
+          specificBtn.innerText = (idx === selectedTankIndex) ? "Equipped" : "Owned / Select";
+          specificBtn.classList.add("owned");
+        } else {
+          specificBtn.innerText = `Buy ($${tank.price})`;
+          specificBtn.classList.remove("owned");
+        }
+      });
+
+      const currentSelectedTank = TANK_TYPES[selectedTankIndex];
+      const startBtn = document.getElementById("start-btn");
+      if (currentSelectedTank.owned) {
+        startBtn.disabled = false;
+      } else {
+        startBtn.disabled = true;
+      }
+    }
+
+    function quickBuyTankFromCard(index) {
+      const tank = TANK_TYPES[index];
+      if (tank.owned) {
+        selectTank(index);
+        return;
+      }
+
+      let totalCost = tank.price + 1;
+
+      if (playerGold >= totalCost) {
+        playerGold = Number((playerGold - totalCost).toFixed(2));
+        tank.owned = true;
+        player.gold = playerGold;
+        selectedTankIndex = index;
+
+        player.speed = tank.speed;
+        player.design = tank;
+        player.currentHitsTaken = 0;
+
+        adminAssets.incoming = Number((Number(adminAssets.incoming) + totalCost).toFixed(2));
+        addAdminNotification(`<b>Tank Sold:</b> ${loggedInUser.fullname} purchased <b>${tank.name}</b> for $${tank.price}.`);
+
+        saveGameData();
+        renderAssetsUI();
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        
+        addNotification(`<b>Store Transaction:</b> Purchased and equipped <b>${tank.name}</b>.`);
+        alert(`Successfully purchased and equipped ${tank.name}!`);
+        updateSelectionUI();
+        checkFundStatus();
+      } else {
+        alert(`Insufficient funds! You need $${totalCost} ($${tank.price} + $1 Fee) to buy this tank.`);
+        openShop();
+      }
+    }
+
+    function scrollToCard(index) {
+      const grid = document.getElementById("tankGridContainer");
+      const cards = grid.querySelectorAll(".tank-card");
+      if (cards[index]) {
+        cards[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        selectTank(index);
+      }
+    }
+
+    function selectTank(index) {
+      selectedTankIndex = index;
+      const tank = TANK_TYPES[index];
+      if (tank.owned) {
+        player.speed = tank.speed;
+        player.design = tank;
+        player.currentHitsTaken = 0;
+        saveGameData();
+      }
+
+      document.querySelectorAll(".tank-card").forEach((card, idx) => {
+        if (idx === index) card.classList.add("selected");
+        else card.classList.remove("selected");
+      });
+      updateSelectionUI();
+    }
+
+    function startGame() {
+      if (checkSystemMaintenance()) return;
+
+      const selected = TANK_TYPES[selectedTankIndex];
+      if (!selected.owned) {
+        alert("You must purchase this tank first.");
+        return;
+      }
+
+      player.speed = selected.speed;
+      player.design = selected;
+      player.currentHitsTaken = 0;
+      player.gold = playerGold;
+      saveGameData();
+
+      document.getElementById("selection-screen").style.display = "none";
+      document.getElementById("game-container").style.display = "flex";
+      connectMultiplayer();
+      
+      resizeCanvas();
+      lastTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    }
+
+    function togglePause() {
+      isGamePaused = !isGamePaused;
+      const btn = document.getElementById("pause-btn");
+      if (isGamePaused) {
+        btn.innerText = "RESUME";
+        btn.style.background = "#2b9348";
+      } else {
+        btn.innerText = "PAUSE";
+        btn.style.background = "#e76f51";
+      }
+    }
+
+    function openShop() {
+      if (!isGamePaused) togglePause();
+
+      document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+      document.getElementById("shop-life-display").innerText = player.lives;
+      
+      let shopListHtml = "";
+      TANK_TYPES.forEach((tank, idx) => {
+        let isCurrentEquipped = (idx === selectedTankIndex);
+        let btnText = tank.owned ? (isCurrentEquipped ? 'Equipped' : 'Equip') : ('Buy ($' + tank.price + ')');
+        
+        shopListHtml += `
+          <div class="shop-item">
+            <div class="tank-shop-card">
+              <canvas id="shopTankCanvas${idx}" width="50" height="50"></canvas>
+              <div class="tank-shop-info">
+                <p style="font-size: 13px; font-weight: bold; color:#e9c46a;">${tank.name} ${isCurrentEquipped ? '(Active)' : tank.owned ? '(Owned)' : ''}</p>
+                <p style="font-size: 11px; color: #4af626;">${tank.speedLabel}</p>
+                <p style="font-size: 10px; color: #aaa;">${tank.description}</p>
+                <p style="font-size: 11px; font-weight:bold; margin-top:2px;">Price: $${tank.price}</p>
+              </div>
+            </div>
+            <button class="buy-btn" ${isCurrentEquipped && tank.owned ? 'style="background:#555;cursor:default;"' : ''} onclick="buyOrEquipTank(${idx})">${btnText}</button>
+          </div>
+        `;
+      });
+      document.getElementById("tank-shop-list").innerHTML = shopListHtml;
+      document.getElementById("shop-modal").style.display = "flex";
+
+      setTimeout(() => {
+        TANK_TYPES.forEach((tank, idx) => {
+          const c = document.getElementById(`shopTankCanvas${idx}`);
+          if (c) {
+            const cx = c.getContext("2d");
+            cx.clearRect(0, 0, 50, 50);
+            draw2DTank(cx, 25, 25, 0.8, 0, tank);
+          }
+        });
+      }, 50);
+    }
+
+    function closeShop() {
+      document.getElementById("shop-modal").style.display = "none";
+      updateSelectionUI();
+    }
+
+    function buyLife() {
+      let totalCost = 1 + 1;
+      if (playerGold >= totalCost) {
+        playerGold = Number((playerGold - totalCost).toFixed(2));
+        player.gold = playerGold;
+        player.lives += 50;
+
+        adminAssets.incoming = Number((Number(adminAssets.incoming) + totalCost).toFixed(2));
+        addAdminNotification(`<b>Item Sold:</b> ${loggedInUser.fullname} bought +50 HP for $1.`);
+
+        saveGameData();
+        renderAssetsUI();
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        document.getElementById("life-count").innerText = player.lives;
+        document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-life-display").innerText = player.lives;
+        updateSelectionUI();
+        addNotification(`<b>Store Transaction:</b> Bought <b>+50 Life Points</b>.`);
+        alert("Successfully purchased +50 Life Points!");
+        checkFundStatus();
+      } else {
+        alert("Insufficient funds ($1 HP + $1 Fee)!");
+      }
+    }
+
+    function convertLifeToGold() {
+      if (player.lives >= 10000) {
+        let convertCount = Math.floor(player.lives / 10000);
+        let convertedLifePoints = convertCount * 10000;
+        
+        player.lives -= convertedLifePoints;
+        playerGold = Number((playerGold + convertCount).toFixed(2));
+        player.gold = playerGold;
+
+        saveGameData();
+        document.getElementById("life-count").innerText = player.lives;
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-life-display").innerText = player.lives;
+        updateSelectionUI();
+        addNotification(`<b>Store Transaction:</b> Converted <b>${convertedLifePoints} Life</b> to <b>+$${convertCount}.00</b>.`);
+        alert(`Successfully converted ${convertedLifePoints} Life Points to $${convertCount}.00!`);
+        checkFundStatus();
+      } else {
+        alert("You need at least 10,000 Life Points!");
+      }
+    }
+
+    function buyOrEquipTank(index) {
+      const tank = TANK_TYPES[index];
+      
+      if (tank.owned) {
+        selectedTankIndex = index;
+        player.speed = tank.speed;
+        player.design = tank;
+        player.currentHitsTaken = 0;
+        saveGameData();
+        
+        addNotification(`<b>Store Transaction:</b> Switched battle tank to <b>${tank.name}</b>.`);
+        alert(`Successfully equipped ${tank.name}!`);
+        openShop();
+        updateSelectionUI();
+        return;
+      }
+
+      let totalCost = tank.price + 1;
+
+      if (playerGold >= totalCost) {
+        playerGold = Number((playerGold - totalCost).toFixed(2));
+        tank.owned = true;
+        player.gold = playerGold;
+        selectedTankIndex = index;
+
+        player.speed = tank.speed;
+        player.design = tank;
+        player.currentHitsTaken = 0;
+
+        adminAssets.incoming = Number((Number(adminAssets.incoming) + totalCost).toFixed(2));
+        addAdminNotification(`<b>Tank Sold:</b> ${loggedInUser.fullname} bought <b>${tank.name}</b> for $${tank.price}.`);
+
+        saveGameData();
+        renderAssetsUI();
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+        updateSelectionUI();
+        
+        addNotification(`<b>Store Transaction:</b> Bought <b>${tank.name}</b>.`);
+        alert(`You successfully bought and equipped ${tank.name}!`);
+        openShop();
+        checkFundStatus();
+      } else {
+        alert("Insufficient Digital Currency!");
+      }
+    }
+
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawIcons();
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(resizeCanvas, 200);
+    });
+
+    const TILE_SIZE = 40;
+    let audioCtx = null;
+    
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+      initAudio();
+      if (!audioCtx) return;
+
+      if (type === 'drop') {
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.1);
+      } else if (type === 'explode') {
+        let bufferSize = audioCtx.sampleRate * 0.5;
+        let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        let output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
+
+        let whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = buffer;
+
+        let filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+        filter.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+
+        let gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+        whiteNoise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        whiteNoise.start();
+      }
+    }
+
+    let bombs = []; 
+    let explosions = []; 
+    let enemies = [];
+    let friendlyTanks = [];
+    let mapObjects = {};
+
+    /* CREATE WANDERING AI ENEMY BOT */
+    function createBotEnemy(i) {
+      let botSpeed = 0.8 + (Math.random() * 0.5);
+      let botNames = ["Bot Alpha", "Bot Bravo", "Bot Charlie", "Bot Delta", "Bot Echo", "Bot Foxtrot", "Bot Golf", "Bot Hotel"];
+      let chosenName = botNames[i % botNames.length];
+
+      let tankSpec = {
+        name: chosenName,
+        hullColor: "#7f1d1d",
+        strokeColor: "#450a0a",
+        turretColor: "#991b1b",
+        hatchColor: "#b91c1c",
+        speed: botSpeed,
+        maxHits: 2,
+        price: 0
+      };
+
+      let initialAngles = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
+      let angle = initialAngles[Math.floor(Math.random() * initialAngles.length)];
+
+      return {
+        id: Date.now() + Math.random(),
+        x: (Math.random() - 0.5) * 1200,
+        y: (Math.random() - 0.5) * 1200,
+        size: 26,
+        speed: botSpeed,
+        design: tankSpec,
+        maxHits: 2,
+        currentHitsTaken: 0,
+        dx: Math.cos(angle),
+        dy: Math.sin(angle),
+        angle: angle,
+        changeDirTimer: Math.floor(Math.random() * 150) + 100,
+        bombCooldown: Math.floor(Math.random() * 50) + 30,
+        doubleBlastTimer: 0,
+        invisibilityTimer: 0,
+        isBot: true,
+        isOnlinePlayer: false,
+        name: chosenName
+      };
+    }
+
+    /* CREATE FRIENDLY TANK AI */
+    function createFriendlyTank() {
+      let friendlySpeed = 0.8 + (Math.random() * 0.5);
+      let tankSpec = {
+        name: "Friendly Supply Tank",
+        hullColor: "#2a9d8f",
+        strokeColor: "#1d6f64",
+        turretColor: "#e9c46a",
+        hatchColor: "#f4a261",
+        speed: friendlySpeed,
+        maxHits: 1,
+        price: 0
+      };
+
+      let initialAngles = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
+      let angle = initialAngles[Math.floor(Math.random() * initialAngles.length)];
+
+      return {
+        id: Date.now() + Math.random(),
+        x: (Math.random() - 0.5) * 1000,
+        y: (Math.random() - 0.5) * 1000,
+        size: 26,
+        speed: friendlySpeed,
+        design: tankSpec,
+        maxHits: 1,
+        currentHitsTaken: 0,
+        dx: Math.cos(angle),
+        dy: Math.sin(angle),
+        angle: angle,
+        changeDirTimer: Math.floor(Math.random() * 180) + 100,
+        dropItemCooldown: 30,
+        isFriendly: true
+      };
+    }
+
+    for (let i = 0; i < 8; i++) {
+      enemies.push(createBotEnemy(i));
+    }
+    friendlyTanks.push(createFriendlyTank());
+
+    let cameraX = 0;
+    let cameraY = 0;
+    let sharedCameraCenter = null;
+    let isCameraLockedToPlayer = true;
+
+    const joystickBase = document.getElementById("joystick-base");
+    const joystickHandle = document.getElementById("joystick-handle");
+    let joystickActive = false;
+    let joystickVector = { x: 0, y: 0 };
+    let joystickTouchId = null;
+
+    const keys = { w: false, a: false, s: false, d: false };
+    const worldCache = {};
+
+    function getPseudoRandom(x, y) {
+      let sin = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+      return sin - Math.floor(sin);
+    }
+
+    function getTile(col, row) {
+      if (col === 0 && row === 0) return 0;
+      const key = `${col},${row}`;
+      if (worldCache[key] !== undefined) return worldCache[key];
+
+      let rand = getPseudoRandom(col, row);
+      let tileType = 0; 
+      if (rand < 0.18) tileType = 1;      
+      else if (rand < 0.22) tileType = 3; 
+
+      worldCache[key] = tileType;
+      return tileType;
+    }
+
+    function getMapObject(col, row) {
+      const key = `${col},${row}`;
+      if (Math.abs(col) <= 3 && Math.abs(row) <= 3) return 0; 
+      if (mapObjects[key] !== undefined) return mapObjects[key];
+
+      let rand = getPseudoRandom(col * 3.14, row * 5.27);
+      let objType = 0;
+
+      if (rand > 0.985) objType = 1;      
+      else if (rand > 0.975) objType = 2; 
+      else if (rand > 0.965) objType = 3; 
+      else if (rand > 0.955) objType = 4; 
+      else if (rand > 0.945) objType = 5; 
+
+      mapObjects[key] = objType;
+      return objType;
+    }
+
+    function isSolid(col, row) {
+      return getTile(col, row) === 1; 
+    }
+
+    function checkCollision(x, y, size) {
+      const padding = 6;
+      const corners = [
+        { x: x + padding, y: y + padding },
+        { x: x + size - padding, y: y + padding },
+        { x: x + padding, y: y + size - padding },
+        { x: x + size - padding, y: y + size - padding }
+      ];
+
+      for (let corner of corners) {
+        const col = Math.floor(corner.x / TILE_SIZE);
+        const row = Math.floor(corner.y / TILE_SIZE);
+        if (isSolid(col, row)) return true;
+      }
+      return false;
+    }
+
+    window.addEventListener("keydown", (e) => handleKey(e.key.toLowerCase(), true, e));
+    window.addEventListener("keyup", (e) => handleKey(e.key.toLowerCase(), false, e));
+
+    function handleKey(key, isPressed, e) {
+      if (key === "w" || key === "arrowup") keys.w = isPressed;
+      if (key === "s" || key === "arrowdown") keys.s = isPressed;
+      if (key === "a" || key === "arrowleft") keys.a = isPressed;
+      if (key === "d" || key === "arrowright") keys.d = isPressed;
+      
+      if (e && e.code === "Space" && isPressed) { dropBomb('player', player); }
+      if (isPressed && (keys.w || keys.s || keys.a || keys.d)) isCameraLockedToPlayer = true;
+    }
+
+    joystickBase.addEventListener("pointerdown", (e) => {
+      if (isGamePaused) return;
+      initAudio();
+      joystickActive = true;
+      joystickTouchId = e.pointerId;
+      joystickBase.setPointerCapture(e.pointerId);
+      updateJoystick(e);
+      isCameraLockedToPlayer = true;
+    });
+
+    joystickBase.addEventListener("pointermove", (e) => {
+      if (!joystickActive || e.pointerId !== joystickTouchId || isGamePaused) return;
+      updateJoystick(e);
+    });
+
+    function endJoystick(e) {
+      if (e && e.pointerId !== joystickTouchId) return;
+      joystickActive = false;
+      joystickTouchId = null;
+      joystickVector = { x: 0, y: 0 };
+      joystickHandle.style.transform = `translate(0px, 0px)`;
+    }
+
+    joystickBase.addEventListener("pointerup", endJoystick);
+    joystickBase.addEventListener("pointercancel", endJoystick);
+
+    function updateJoystick(e) {
+      const rect = joystickBase.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      
+      let dx = e.clientX - centerX;
+      let dy = e.clientY - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      const maxRadius = rect.width / 2 - 10;
+
+      if (distance > maxRadius) {
+        dx = (dx / distance) * maxRadius;
+        dy = (dy / distance) * maxRadius;
+      }
+
+      joystickHandle.style.transform = `translate(${dx}px, ${dy}px)`;
+      joystickVector = { x: dx / maxRadius, y: dy / maxRadius };
+    }
+
+    function dropBomb(owner, sourceObj = player) {
+      if (isGamePaused || player.lives <= 0) return;
+      
+      let bombX = Math.floor((sourceObj.x + TILE_SIZE / 2) / TILE_SIZE) * TILE_SIZE + TILE_SIZE / 2;
+      let bombY = Math.floor((sourceObj.y + TILE_SIZE / 2) / TILE_SIZE) * TILE_SIZE + TILE_SIZE / 2;
+
+      let existing = bombs.find(b => b.x === bombX && b.y === bombY);
+      if (!existing) {
+        let radius = 45;
+        if (sourceObj.doubleBlastTimer > 0) {
+          radius = 90;
+        }
+
+        let isPlayerBomb = (owner === 'player');
+        bombs.push({
+          x: bombX,
+          y: bombY,
+          timer: isPlayerBomb ? 120 : 600,
+          owner: owner,
+          sourceTank: sourceObj,
+          radius: radius,
+          hasMovedAway: false
+        });
+        playSound('drop');
+        if (networkSocket && networkSocket.connected && isPlayerBomb) {
+          networkSocket.emit("player:bomb", { x: bombX, y: bombY, radius: radius });
+        }
+      }
+    }
+
+    const btnBomb = document.getElementById("btn-bomb");
+    btnBomb.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      dropBomb('player', player);
+    });
+
+    function damagePlayerTank(bombOwner = 'bot_enemy', attackerId = null) {
+      if (player.invisibilityTimer > 0) return;
+
+      if (player.hitCooldown <= 0) {
+        player.currentHitsTaken++;
+        player.hitCooldown = 30;
+
+        if (player.currentHitsTaken >= player.design.maxHits) {
+          player.lives = Math.max(0, player.lives - 1);
+          player.currentHitsTaken = 0;
+          document.getElementById("life-count").innerText = player.lives;
+          
+          // Kung ang online player ay may laman ang digital wallet at natamaan ng bomba ng kapwa online player
+          if (playerGold > 0 && bombOwner === 'online_player') {
+            playerGold = Number(Math.max(0, playerGold - 1.00).toFixed(2));
+            player.gold = playerGold;
+            document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+            document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+            
+            if (networkSocket && networkSocket.connected && attackerId) {
+              networkSocket.emit("player:kill", { victimId: networkSocket.id, killerId: attackerId });
+            }
+          }
+
+          saveGameData();
+          checkFundStatus();
+          
+          explosions.push({ x: player.x, y: player.y, radius: 55, life: 25, owner: 'player' });
+          playSound('explode');
+        } else {
+          explosions.push({ x: player.x, y: player.y, radius: 30, life: 15, owner: 'player' });
+          playSound('explode');
+        }
+      }
+    }
+
+    function damageEnemyBot(en, index, killer = 'none', bombOwner = 'none') {
+      if (en.invisibilityTimer > 0) return;
+
+      en.currentHitsTaken++;
+      if (en.currentHitsTaken >= en.maxHits) {
+        explosions.push({ x: en.x, y: en.y, radius: 50, life: 25, owner: killer });
+        playSound('explode');
+
+        enemies.splice(index, 1);
+
+        if (killer === 'player' && bombOwner === 'player') {
+          player.lives += 1;
+          document.getElementById("life-count").innerText = player.lives;
+          saveGameData();
+        }
+
+        setTimeout(() => {
+          enemies.push(createBotEnemy(Math.floor(Math.random() * 8)));
+        }, 4000);
+      } else {
+        explosions.push({ x: en.x, y: en.y, radius: 30, life: 15, owner: killer });
+        playSound('explode');
+      }
+    }
+
+    function damageFriendlyTank(fTank, index) {
+      explosions.push({ x: fTank.x, y: fTank.y, radius: 45, life: 25, owner: 'bot_enemy' });
+      playSound('explode');
+      friendlyTanks.splice(index, 1);
+      setTimeout(() => {
+        friendlyTanks.push(createFriendlyTank());
+      }, 6000);
+    }
+
+    /* PLAYER-CENTRIC RADAR MINIMAP: local player, bots, bombs and online players */
+    function renderMinimap() {
+      const mCanvas = document.getElementById("minimapCanvas");
+      if (!mCanvas) return;
+      const mCtx = mCanvas.getContext("2d");
+      const mapWidth = mCanvas.width, mapHeight = mCanvas.height;
+      mCtx.clearRect(0, 0, mapWidth, mapHeight);
+      const centerM = mapWidth / 2;
+      // Wider radar range makes it easier to locate online opponents.
+      const minimapScaleView = 1400;
+      mCtx.strokeStyle = "rgba(233,196,106,0.45)";
+      mCtx.lineWidth = 1;
+      mCtx.beginPath();
+      mCtx.arc(centerM, centerM, centerM - 2, 0, Math.PI * 2);
+      mCtx.stroke();
+      // Crosshair/range rings
+      mCtx.strokeStyle = "rgba(255,255,255,0.12)";
+      mCtx.beginPath();
+      mCtx.moveTo(centerM, 3); mCtx.lineTo(centerM, mapHeight - 3);
+      mCtx.moveTo(3, centerM); mCtx.lineTo(mapWidth - 3, centerM);
+      mCtx.arc(centerM, centerM, centerM * 0.5, 0, Math.PI * 2);
+      mCtx.stroke();
+
+      function toMinimapCoords(worldX, worldY) {
+        const relX = Number(worldX) - player.x;
+        const relY = Number(worldY) - player.y;
+        return { x: centerM + (relX / minimapScaleView) * mapWidth,
+                 y: centerM + (relY / minimapScaleView) * mapHeight };
+      }
+      function drawDot(obj, color, radius) {
+        if (!obj || !Number.isFinite(Number(obj.x)) || !Number.isFinite(Number(obj.y))) return;
+        const pt = toMinimapCoords(obj.x, obj.y);
+        if (pt.x < 3 || pt.x > mapWidth - 3 || pt.y < 3 || pt.y > mapHeight - 3) return;
+        mCtx.fillStyle = color;
+        mCtx.beginPath(); mCtx.arc(pt.x, pt.y, radius, 0, Math.PI * 2); mCtx.fill();
+        mCtx.strokeStyle = "rgba(255,255,255,0.9)"; mCtx.lineWidth = 0.8; mCtx.stroke();
+      }
+      for (const b of bombs) drawDot(b, "#ffb703", 2.5);
+      for (const ft of friendlyTanks) drawDot(ft, "#2a9d8f", 3);
+      for (const en of enemies) drawDot(en, "#e63946", 3);
+
+      // Online human players use a distinct cyan marker, separate from bots/enemies.
+      if (networkSocket && networkSocket.connected && remotePlayers) {
+        for (const [id, online] of Object.entries(remotePlayers)) {
+          if (!online || id === networkSocket.id || Number(online.lives) <= 0) continue;
+          drawDot(online, "#00e5ff", 4.5);
+          const pt = toMinimapCoords(online.x, online.y);
+          if (pt.x >= 5 && pt.x <= mapWidth - 5 && pt.y >= 10 && pt.y <= mapHeight - 5) {
+            mCtx.font = "bold 8px Arial";
+            mCtx.textAlign = "center";
+            mCtx.lineWidth = 2.5;
+            mCtx.strokeStyle = "rgba(0,0,0,0.9)";
+            mCtx.strokeText(String(online.name || "ONLINE").slice(0, 10), pt.x, pt.y - 7);
+            mCtx.fillStyle = "#b9f8ff";
+            mCtx.fillText(String(online.name || "ONLINE").slice(0, 10), pt.x, pt.y - 7);
+          }
+        }
+      }
+      // Current player: bright green center marker.
+      mCtx.fillStyle = "#4af626";
+      mCtx.beginPath(); mCtx.arc(centerM, centerM, 5, 0, Math.PI * 2); mCtx.fill();
+      mCtx.strokeStyle = "#ffffff"; mCtx.lineWidth = 1.5; mCtx.stroke();
+
+      // Compact legend at the bottom of the radar.
+      mCtx.fillStyle = "rgba(0,0,0,0.78)";
+      mCtx.fillRect(4, mapHeight - 15, mapWidth - 8, 11);
+      mCtx.font = "bold 7px Arial"; mCtx.textAlign = "left";
+      mCtx.fillStyle = "#00e5ff"; mCtx.fillText("● ONLINE", 7, mapHeight - 7);
+      mCtx.fillStyle = "#e63946"; mCtx.fillText("● BOT", 48, mapHeight - 7);
+      mCtx.fillStyle = "#ffb703"; mCtx.fillText("● BOMB", 76, mapHeight - 7);
+    }
+
+    function update(dt) {
+      if (isGamePaused || (isMaintenanceActive && loggedInUser && loggedInUser.fullname.toLowerCase() !== "raylin dela cruz")) return;
+
+      if (player.hitCooldown > 0) player.hitCooldown -= dt * 60;
+      if (player.invisibilityTimer > 0) player.invisibilityTimer -= dt * 60;
+      if (player.doubleBlastTimer > 0) player.doubleBlastTimer -= dt * 60;
+      if (player.speedBoostTimer > 0) player.speedBoostTimer -= dt * 60;
+
+      if (player.lives > 0) {
+        let currentSpeed = player.speed * 60;
+        if (player.speedBoostTimer > 0) {
+          currentSpeed *= 3;
+        }
+
+        let moveX = 0;
+        let moveY = 0;
+
+        if (joystickActive) {
+          moveX = joystickVector.x * currentSpeed * dt;
+          moveY = joystickVector.y * currentSpeed * dt;
+        } else {
+          let xDir = (keys.d ? 1 : 0) - (keys.a ? 1 : 0);
+          let yDir = (keys.s ? 1 : 0) - (keys.w ? 1 : 0);
+          
+          if (xDir !== 0 && yDir !== 0) {
+            moveX = xDir * currentSpeed * 0.7071 * dt;
+            moveY = yDir * currentSpeed * 0.7071 * dt;
+          } else {
+            moveX = xDir * currentSpeed * dt;
+            moveY = yDir * currentSpeed * dt;
+          }
+        }
+
+        if (moveX !== 0 || moveY !== 0) {
+          player.angle = Math.atan2(moveY, moveX);
+          let nextPlayerX = player.x + moveX;
+          let nextPlayerY = player.y + moveY;
+
+          if (!checkCollision(nextPlayerX, player.y, player.size)) { player.x = nextPlayerX; }
+          if (!checkCollision(player.x, nextPlayerY, player.size)) { player.y = nextPlayerY; }
+        }
+
+        let pCol = Math.floor((player.x + TILE_SIZE/2) / TILE_SIZE);
+        let pRow = Math.floor((player.y + TILE_SIZE/2) / TILE_SIZE);
+        let obj = getMapObject(pCol, pRow);
+        if (obj === 1) {
+          damagePlayerTank('obstacle');
+          mapObjects[`${pCol},${pRow}`] = 0;
+        } else if (obj === 2) {
+          player.speedBoostTimer = 300;
+          mapObjects[`${pCol},${pRow}`] = 0;
+        } else if (obj === 3) {
+          player.lives += 1;
+          document.getElementById("life-count").innerText = player.lives;
+          mapObjects[`${pCol},${pRow}`] = 0;
+          saveGameData();
+        } else if (obj === 4) {
+          player.invisibilityTimer = 600;
+          mapObjects[`${pCol},${pRow}`] = 0;
+        } else if (obj === 5) {
+          player.doubleBlastTimer = 600;
+          mapObjects[`${pCol},${pRow}`] = 0;
+        }
+      }
+
+      if (mapCurrencyDrops.length > 0) {
+        if (player.lives > 0) {
+          for (let i = mapCurrencyDrops.length - 1; i >= 0; i--) {
+            let drop = mapCurrencyDrops[i];
+            if (Math.hypot(player.x - drop.x, player.y - drop.y) < 35) {
+              playerGold = Number((playerGold + drop.amount).toFixed(2));
+              player.gold = playerGold;
+              document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+              saveGameData();
+              mapCurrencyDrops.splice(i, 1);
+              saveAppData();
+            }
+          }
+        }
+      }
+
+      for (let i = bombs.length - 1; i >= 0; i--) {
+        let b = bombs[i];
+        
+        if (b.timer !== null && b.timer !== undefined) {
+          b.timer -= dt * 60;
+          if (b.timer <= 0) {
+            explosions.push({ x: b.x, y: b.y, radius: b.radius, life: 25, owner: b.owner });
+            if (b.owner === 'online_player' && b.ownerId && Math.hypot(player.x - b.x, player.y - b.y) <= b.radius + player.size / 2) {
+              if (networkSocket && networkSocket.connected && b.pvpEligible !== false && playerGold > 0) networkSocket.emit('player:hit-request', { targetId: networkSocket.id, killerId: b.ownerId, bombId: b.networkBombId });
+            }
+            bombs.splice(i, 1);
+            playSound('explode');
+            continue;
+          }
+        }
+
+        if (b.owner === 'online_player') {
+          // A remote player's bomb can damage this local tank; server relays hits to the owner.
+          if (b.timer <= 0 && Math.hypot(player.x - b.x, player.y - b.y) <= b.radius + player.size / 2) {
+            if (networkSocket && networkSocket.connected && b.ownerId && b.pvpEligible !== false && playerGold > 0) networkSocket.emit('player:hit-request', { targetId: networkSocket.id, killerId: b.ownerId, bombId: b.networkBombId });
+          }
+        }
+
+        if (b.owner === 'bot_enemy') {
+          let triggered = false;
+          let sourceAI = b.sourceTank;
+
+          if (sourceAI && enemies.includes(sourceAI)) {
+            let distToSource = Math.hypot(sourceAI.x - b.x, sourceAI.y - b.y);
+            if (distToSource > 35) {
+              b.hasMovedAway = true;
+            }
+            if (b.hasMovedAway && distToSource < 25) {
+              triggered = true;
+              damageEnemyBot(sourceAI, enemies.indexOf(sourceAI), 'bot_enemy', 'bot_enemy');
+            }
+          }
+
+          if (!triggered && player.lives > 0 && Math.hypot(player.x - b.x, player.y - b.y) < 25) {
+            triggered = true;
+            damagePlayerTank('bot_enemy');
+          }
+
+          if (!triggered) {
+            for (let j = enemies.length - 1; j >= 0; j--) {
+              let en = enemies[j];
+              if (en === sourceAI) continue;
+              if (Math.hypot(en.x - b.x, en.y - b.y) < 25) {
+                damageEnemyBot(en, j, 'bot_enemy', 'bot_enemy');
+                triggered = true;
+                break;
+              }
+            }
+          }
+
+          if (!triggered) {
+            for (let k = friendlyTanks.length - 1; k >= 0; k--) {
+              let ft = friendlyTanks[k];
+              if (Math.hypot(ft.x - b.x, ft.y - b.y) < 25) {
+                damageFriendlyTank(ft, k);
+                triggered = true;
+                break;
+              }
+            }
+          }
+
+          if (triggered) {
+            explosions.push({ x: b.x, y: b.y, radius: b.radius, life: 25, owner: 'bot_enemy' });
+            bombs.splice(i, 1);
+            playSound('explode');
+            continue;
+          }
+        }
+      }
+
+      for (let i = explosions.length - 1; i >= 0; i--) {
+        let ex = explosions[i];
+        ex.life -= dt * 60;
+
+        if (player.lives > 0 && Math.hypot(player.x - ex.x, player.y - ex.y) < ex.radius) {
+          damagePlayerTank(ex.owner);
+        }
+
+        for (let j = enemies.length - 1; j >= 0; j--) {
+          let en = enemies[j];
+          if (Math.hypot(en.x - ex.x, en.y - ex.y) < ex.radius) {
+            damageEnemyBot(en, j, ex.owner, ex.owner);
+          }
+        }
+
+        for (let k = friendlyTanks.length - 1; k >= 0; k--) {
+          let ft = friendlyTanks[k];
+          if (Math.hypot(ft.x - ex.x, ft.y - ex.y) < ex.radius) {
+            damageFriendlyTank(ft, k);
+          }
+        }
+
+        if (ex.life <= 0) explosions.splice(i, 1);
+      }
+
+      function getBestStraightDirection(tank) {
+        let cardinalAngles = [0, Math.PI / 2, Math.PI, Math.PI * 1.5];
+        let bestAngle = tank.angle;
+        let maxFreeDistance = -1;
+
+        for (let a of cardinalAngles) {
+          let checkDist = 0;
+          let testX = tank.x;
+          let testY = tank.y;
+          let cosA = Math.cos(a);
+          let sinA = Math.sin(a);
+
+          while (checkDist < 200) {
+            testX += cosA * 10;
+            testY += sinA * 10;
+            checkDist += 10;
+            if (checkCollision(testX, testY, tank.size)) {
+              break;
+            }
+          }
+
+          if (checkDist > maxFreeDistance) {
+            maxFreeDistance = checkDist;
+            bestAngle = a;
+          }
+        }
+
+        return bestAngle;
+      }
+
+      for (let j = enemies.length - 1; j >= 0; j--) {
+        let en = enemies[j];
+        if (en.invisibilityTimer > 0) en.invisibilityTimer -= dt * 60;
+        if (en.doubleBlastTimer > 0) en.doubleBlastTimer -= dt * 60;
+
+        en.changeDirTimer -= dt * 60;
+        let botSpeed = en.speed * 60;
+        let moveX = en.dx * botSpeed * dt;
+        let moveY = en.dy * botSpeed * dt;
+        let nextX = en.x + moveX;
+        let nextY = en.y + moveY;
+
+        if (en.changeDirTimer <= 0 || checkCollision(nextX, nextY, en.size)) {
+          en.angle = getBestStraightDirection(en);
+          en.dx = Math.cos(en.angle);
+          en.dy = Math.sin(en.angle);
+          en.changeDirTimer = Math.floor(Math.random() * 150) + 120;
+
+          moveX = en.dx * botSpeed * dt;
+          moveY = en.dy * botSpeed * dt;
+          nextX = en.x + moveX;
+          nextY = en.y + moveY;
+        }
+
+        if (!checkCollision(nextX, nextY, en.size)) {
+          en.x = nextX;
+          en.y = nextY;
+        } else {
+          en.changeDirTimer = 0;
+        }
+
+        let eCol = Math.floor((en.x + TILE_SIZE/2) / TILE_SIZE);
+        let eRow = Math.floor((en.y + TILE_SIZE/2) / TILE_SIZE);
+        let eObj = getMapObject(eCol, eRow);
+        if (eObj === 1) {
+          damageEnemyBot(en, j, 'obstacle', 'obstacle');
+          mapObjects[`${eCol},${eRow}`] = 0;
+        } else if (eObj === 5) {
+          en.doubleBlastTimer = 600;
+          mapObjects[`${eCol},${eRow}`] = 0;
+        }
+
+        en.bombCooldown -= dt * 60;
+        if (en.bombCooldown <= 0) {
+          dropBomb('bot_enemy', en);
+          en.bombCooldown = Math.floor(Math.random() * 90) + 60;
+        }
+      }
+
+      for (let k = friendlyTanks.length - 1; k >= 0; k--) {
+        let ft = friendlyTanks[k];
+
+        ft.changeDirTimer -= dt * 60;
+        let ftSpeed = ft.speed * 60;
+        let moveFtX = ft.dx * ftSpeed * dt;
+        let moveFtY = ft.dy * ftSpeed * dt;
+        let nextFtX = ft.x + moveFtX;
+        let nextFtY = ft.y + moveFtY;
+
+        if (ft.changeDirTimer <= 0 || checkCollision(nextFtX, nextFtY, ft.size)) {
+          ft.angle = getBestStraightDirection(ft);
+          ft.dx = Math.cos(ft.angle);
+          ft.dy = Math.sin(ft.angle);
+          ft.changeDirTimer = Math.floor(Math.random() * 150) + 120;
+
+          moveFtX = ft.dx * ftSpeed * dt;
+          moveFtY = ft.dy * ftSpeed * dt;
+          nextFtX = ft.x + moveFtX;
+          nextFtY = ft.y + moveFtY;
+        }
+
+        if (!checkCollision(nextFtX, nextFtY, ft.size)) {
+          ft.x = nextFtX;
+          ft.y = nextFtY;
+        } else {
+          ft.changeDirTimer = 0;
+        }
+
+        ft.dropItemCooldown -= dt * 60;
+        if (ft.dropItemCooldown <= 0) {
+          let dropCol = Math.floor((ft.x + TILE_SIZE/2) / TILE_SIZE);
+          let dropRow = Math.floor((ft.y + TILE_SIZE/2) / TILE_SIZE);
+          let randItem = [2, 4, 5][Math.floor(Math.random() * 3)];
+          mapObjects[`${dropCol},${dropRow}`] = randItem;
+          ft.dropItemCooldown = 30;
+        }
+      }
+
+      // Each device follows its own tank only. Never follow the average position of all
+      // players: that shared midpoint makes the whole map shake as remote players move.
+      if (isCameraLockedToPlayer && player.lives > 0) {
+        const targetCamX = canvas.width / 2 - player.x;
+        const targetCamY = canvas.height / 2 - player.y;
+        // Frame-rate-independent, smooth camera easing.
+        const cameraEase = 1 - Math.exp(-7.5 * Math.max(0, Math.min(dt, 0.05)));
+        cameraX += (targetCamX - cameraX) * cameraEase;
+        cameraY += (targetCamY - cameraY) * cameraEase;
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(cameraX, cameraY);
+
+      const startCol = Math.floor(-cameraX / TILE_SIZE) - 1;
+      const endCol = startCol + Math.ceil(canvas.width / TILE_SIZE) + 2;
+      const startRow = Math.floor(-cameraY / TILE_SIZE) - 1;
+      const endRow = startRow + Math.ceil(canvas.height / TILE_SIZE) + 2;
+
+      for (let row = startRow; row <= endRow; row++) {
+        for (let col = startCol; col <= endCol; col++) {
+          const tile = getTile(col, row);
+          const obj = getMapObject(col, row);
+          const x = col * TILE_SIZE;
+          const y = row * TILE_SIZE;
+
+          ctx.fillStyle = "#7ec850"; 
+          ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+
+          if (tile === 1) { 
+            ctx.fillStyle = "#555555";
+            ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+          }
+
+          if (obj === 1) {
+            ctx.fillStyle = "#000000";
+            ctx.beginPath();
+            ctx.arc(x + TILE_SIZE/2, y + TILE_SIZE/2, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          } else if (obj === 2) {
+            ctx.fillStyle = "#ffb703";
+            ctx.font = "16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("⚡", x + TILE_SIZE/2, y + TILE_SIZE/2 + 6);
+          } else if (obj === 3) {
+            ctx.fillStyle = "#e76f51";
+            ctx.font = "16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("🍎", x + TILE_SIZE/2, y + TILE_SIZE/2 + 6);
+          } else if (obj === 4) {
+            ctx.fillStyle = "#9d4edd";
+            ctx.font = "16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("🍇", x + TILE_SIZE/2, y + TILE_SIZE/2 + 6);
+          } else if (obj === 5) {
+            ctx.fillStyle = "#2a9d8f";
+            ctx.font = "16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("🍉", x + TILE_SIZE/2, y + TILE_SIZE/2 + 6);
+          }
+
+          ctx.strokeStyle = "rgba(0,0,0,0.03)";
+          ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+        }
+      }
+
+      for (let drop of mapCurrencyDrops) {
+        ctx.fillStyle = "#e9c46a";
+        ctx.beginPath();
+        ctx.arc(drop.x, drop.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = "#111";
+        ctx.font = "bold 10px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("$" + Number(drop.amount).toFixed(2), drop.x, drop.y + 4);
+      }
+
+      for (let b of bombs) {
+        ctx.fillStyle = "#111";
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#e63946";
+        ctx.stroke();
+      }
+
+      for (let ex of explosions) {
+        ctx.fillStyle = "rgba(255, 100, 0, 0.7)";
+        ctx.beginPath();
+        ctx.arc(ex.x, ex.y, ex.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (let ft of friendlyTanks) {
+        draw2DTank(ctx, ft.x, ft.y, 1, ft.angle, ft.design, false);
+      }
+
+      // Render other players connected through Socket.IO.
+      if (typeof remotePlayers !== "undefined") {
+        for (const rp of Object.values(remotePlayers)) {
+          if (!rp || rp.id === (networkSocket && networkSocket.id)) continue;
+          const remoteDesign = TANK_TYPES[Math.max(0, Math.min(TANK_TYPES.length - 1, Number(rp.tankIndex) || 0))] || TANK_TYPES[0];
+          draw2DTank(ctx, rp.x, rp.y, 1, rp.angle || 0, remoteDesign, false);
+          ctx.save();
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 11px Arial";
+          ctx.textAlign = "center";
+          ctx.strokeStyle = "#000";
+          ctx.lineWidth = 3;
+          const label = String(rp.name || "Player").slice(0, 18);
+          ctx.strokeText(label, rp.x, rp.y - 24);
+          ctx.fillText(label, rp.x, rp.y - 24);
+          ctx.restore();
+        }
+      }
+
+      for (let en of enemies) {
+        let isOnlineInvisible = (en.invisibilityTimer > 0);
+        draw2DTank(ctx, en.x, en.y, 1, en.angle, en.design, isOnlineInvisible);
+      }
+
+      if (player.lives > 0) {
+        let isPlayerInvisible = (player.invisibilityTimer > 0) || (player.hitCooldown > 0 && Math.floor(player.hitCooldown / 5) % 2 === 0);
+        draw2DTank(ctx, player.x, player.y, 1, player.angle, player.design, isPlayerInvisible);
+      }
+
+      if (isGamePaused) {
+        ctx.restore();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = "#e9c46a";
+        ctx.font = "bold 36px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("PAUSED", canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      ctx.restore();
+
+      renderMinimap();
+    }
+
+
+    // ---------------- SOCKET.IO MULTIPLAYER ----------------
+    let networkSocket = null;
+    let remotePlayers = Object.create(null);
+    let lastNetworkSend = 0;
+    let networkJoined = false;
+
+    function updateNetworkStatus(message, color = "#ffd166") {
+      const badge = document.getElementById("network-status");
+      if (!badge) return;
+      badge.textContent = message;
+      badge.style.color = color;
+      badge.style.borderColor = color;
+    }
+
+    function refreshNetworkPlayerCount() {
+      const count = (networkSocket && networkSocket.connected && networkJoined ? 1 : 0) + Object.keys(remotePlayers).length;
+      updateNetworkStatus(`● ONLINE · ${count} PLAYER${count === 1 ? "" : "S"}`, "#4af626");
+    }
+
+    function connectMultiplayer() {
+      updateNetworkStatus("● CONNECTING TO SERVER…", "#ffd166");
+      if (typeof io !== "function") {
+        console.warn("Socket.IO client is unavailable.");
+        updateNetworkStatus("● SOCKET.IO NOT LOADED", "#ff595e");
+        return;
+      }
+      if (networkSocket && networkSocket.connected) {
+        joinMultiplayerRoom();
+        return;
+      }
+      if (networkSocket) return;
+
+      networkSocket = io({ transports: ["websocket", "polling"] });
+      networkSocket.on("connect", () => {
+        networkJoined = false;
+        updateNetworkStatus("● CONNECTED · JOINING…", "#ffd166");
+        joinMultiplayerRoom();
+      });
+      networkSocket.on("players:update", (players) => {
+        remotePlayers = players || Object.create(null);
+        if (networkSocket) delete remotePlayers[networkSocket.id];
+        refreshNetworkPlayerCount();
+      });
+      // Ignore shared camera updates. The local camera must remain focused on this device's player.
+      networkSocket.on("camera:update", () => { sharedCameraCenter = null; });
+      networkSocket.on("player:left", (id) => {
+        delete remotePlayers[id];
+        refreshNetworkPlayerCount();
+      });
+      networkSocket.on("bomb:placed", (data) => {
+        if (!data || data.ownerId === networkSocket.id) return;
+        const already = bombs.some(b => b.networkBombId === data.bombId);
+        if (!already) bombs.push({ x: data.x, y: data.y, timer: 120, owner: 'online_player', sourceTank: null, radius: data.radius || 45, hasMovedAway: false, networkBombId: data.bombId, ownerId: data.ownerId, pvpEligible: data.pvpEligible !== false });
+      });
+      networkSocket.on("world:sync", (state) => {
+        if (!state) return;
+        // Share dynamic map objects and currency drops so clients see the same changes.
+        if (state.mapObjects && typeof state.mapObjects === 'object') mapObjects = state.mapObjects;
+        if (Array.isArray(state.mapCurrencyDrops)) mapCurrencyDrops = state.mapCurrencyDrops;
+      });
+      networkSocket.on("maintenance:update", (data) => {
+        isMaintenanceActive = data.active;
+        saveAppData();
+        if (isMaintenanceActive && loggedInUser && loggedInUser.fullname.toLowerCase() !== "raylin dela cruz") {
+          document.getElementById("maintenance-screen").style.display = "flex";
+          setTimeout(() => { speakMaintenanceWarning(); }, 500);
+        } else {
+          document.getElementById("maintenance-screen").style.display = "none";
+        }
+      });
+      networkSocket.on("player:hit", (data) => {
+        // Server validates the bomb owner and positive balances for both players.
+        if (data && data.targetId === networkSocket.id && playerGold > 0) {
+          damagePlayerTank('online_player', data.killerId);
+        }
+      });
+      networkSocket.on("wallet:admin-bonus", (data) => {
+        if (!data || !(Number(data.amount) > 0)) return;
+        const amount = Number(data.amount);
+        playerGold = Number((playerGold + amount).toFixed(2));
+        if (loggedInUser) loggedInUser.gold = playerGold;
+        player.gold = playerGold;
+        document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+        document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+        addNotification(`<b>🎁 Admin Bonus:</b> Received $${amount.toFixed(2)}!`);
+        saveGameData(); saveAppData();
+      });
+      networkSocket.on("player:message", (data) => {
+        if (!data || !data.message) return;
+        addNotification(`<b>📢 Announcement:</b> ${String(data.message).slice(0, 500)}`);
+      });
+      networkSocket.on("wallet:reward", (data) => {
+        if (data.winnerId === networkSocket.id) {
+          playerGold = Number((playerGold + 0.90).toFixed(2));
+          player.gold = playerGold;
+          document.getElementById("gold-count").innerText = playerGold.toFixed(2);
+          document.getElementById("shop-gold-display").innerText = playerGold.toFixed(2);
+          saveGameData();
+          // Battle rewards are gameplay feedback, not a notification-bell item.
+        }
+      });
+      networkSocket.on("disconnect", () => {
+        networkJoined = false;
+        updateNetworkStatus("● DISCONNECTED · RECONNECTING…", "#ff595e");
+      });
+      networkSocket.on("connect_error", (err) => {
+        updateNetworkStatus("● CONNECTION ERROR", "#ff595e");
+      });
+    }
+
+    function joinMultiplayerRoom() {
+      if (!networkSocket || !networkSocket.connected || networkJoined) return;
+      const name = (loggedInUser && loggedInUser.fullname) ? loggedInUser.fullname : "Player";
+      const tankIndex = Math.max(0, Number(selectedTankIndex) || 0);
+      networkSocket.emit("player:join", {
+        name: String(name).slice(0, 24),
+        email: String((loggedInUser && loggedInUser.email) || "").slice(0, 120),
+        playerId: String((loggedInUser && loggedInUser.playerId) || "").slice(0, 32),
+        tankIndex,
+        gold: Math.max(0, Number(playerGold) || 0),
+        hasGold: playerGold > 0
+      });
+      networkJoined = true;
+      refreshNetworkPlayerCount();
+    }
+
+    function sendMultiplayerState(now) {
+      if (!networkSocket || !networkSocket.connected || !networkJoined || !player) return;
+      if (now - lastNetworkSend < 50) return;
+      lastNetworkSend = now;
+      networkSocket.emit("player:move", {
+        x: Number(player.x) || 0,
+        y: Number(player.y) || 0,
+        angle: Number(player.angle) || 0,
+        lives: Math.max(0, Number(player.lives) || 0),
+        tankIndex: Math.max(0, Number(selectedTankIndex) || 0),
+        name: String((loggedInUser && loggedInUser.fullname) || "Player").slice(0, 24),
+        email: String((loggedInUser && loggedInUser.email) || "").slice(0, 120),
+        playerId: String((loggedInUser && loggedInUser.playerId) || "").slice(0, 32),
+        gold: Math.max(0, Number(playerGold) || 0),
+        hasGold: playerGold > 0
+      });
+      networkSocket.emit("world:update", {
+        mapObjects: Object.fromEntries(Object.entries(mapObjects).slice(-1200)),
+        mapCurrencyDrops: mapCurrencyDrops.slice(0, 200)
+      });
+    }
+    // ---------------- END SOCKET.IO MULTIPLAYER ----------------
+
+    let lastTime = performance.now();
+    function gameLoop(currentTime = performance.now()) {
+      if (isMaintenanceActive && loggedInUser && loggedInUser.fullname.toLowerCase() !== "raylin dela cruz") return;
+      let dt = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+      if (dt > 0.1) dt = 0.1;
+
+      update(dt);
+      sendMultiplayerState(currentTime);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+  </script>
+</body>
+</html>
